@@ -1,0 +1,70 @@
+{
+  "name": "nutridiab",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "1d1fc275-745b-43bd-84b0-8a4ddf594612",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -800,
+        16
+      ],
+      "id": "21592166-a408-48c7-9d6b-2d1550629a89",
+      "name": "Webhook",
+      "webhookId": "1d1fc275-745b-43bd-84b0-8a4ddf594612"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Datos Whatsapp').item.json.server_url }}/message/sendText/{{ $('Datos Whatsapp').item.json.instance }}\n",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Datos Whatsapp').item.json.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Datos Whatsapp').item.json.chatid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{ 2000 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        -16
+      ],
+      "id": "de4e517d-01ee-4516-afbb-1b2056fa1ec2",
+      "name": "Responder mensaje"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}
+
