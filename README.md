@@ -35,7 +35,7 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-n8n estará disponible en: http://localhost:5678
+n8n estará disponible en: https://wf.zynaptic.tech
 
 ### 3. Instalar y ejecutar Frontend
 
@@ -51,7 +51,7 @@ Frontend disponible en: http://localhost:5173
 
 ### Acceso Inicial
 
-1. Visita http://localhost:5678
+1. Visita https://wf.zynaptic.tech
 2. Crea tu cuenta de administrador
 3. Los workflows se guardarán automáticamente en `./n8n/data`
 
@@ -59,7 +59,7 @@ Frontend disponible en: http://localhost:5173
 
 Los webhooks de n8n siguen este formato:
 ```
-http://localhost:5678/webhook/{nombre-webhook}
+https://wf.zynaptic.tech/webhook/{nombre-webhook}
 ```
 
 ## 📡 Integración Frontend - Backend

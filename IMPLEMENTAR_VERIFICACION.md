@@ -382,12 +382,12 @@ http://localhost:5173/registro?token=test123
 
 ```bash
 # Test Generar Token
-curl -X POST http://localhost:5678/webhook/nutridiab/generate-token \
+curl -X POST https://wf.zynaptic.tech/webhook/nutridiab/generate-token \
   -H "Content-Type: application/json" \
   -d '{"usuario_id": 1, "tipo": "registro"}'
 
 # Test Validar Token
-curl -X POST http://localhost:5678/webhook/nutridiab/validate-token \
+curl -X POST https://wf.zynaptic.tech/webhook/nutridiab/validate-token \
   -H "Content-Type: application/json" \
   -d '{"token": "test123"}'
 ```

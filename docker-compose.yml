@@ -20,9 +20,9 @@ services:
       - ./n8n/data:/home/node/.n8n
       - ./n8n/workflows:/workflows
     networks:
-      - nutridia-network
+      - nutridiab-network
 
 networks:
-  nutridia-network:
+  nutridiab-network:
     driver: bridge
 

@@ -62,8 +62,8 @@ frontend/
 Crea un archivo `.env` en la carpeta frontend:
 
 ```env
-VITE_API_URL=http://localhost:5678
-VITE_APP_NAME=NutriDia
+VITE_API_URL=https://wf.zynaptic.tech
+VITE_APP_NAME=Nutridiab
 ```
 
 ### Proxy Configuration
@@ -73,7 +73,7 @@ El archivo `vite.config.js` incluye un proxy para el desarrollo:
 ```javascript
 proxy: {
   '/webhook': {
-    target: 'http://localhost:5678',
+    target: 'https://wf.zynaptic.tech',
     changeOrigin: true,
   }
 }

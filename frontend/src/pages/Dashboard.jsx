@@ -254,7 +254,7 @@ function Dashboard() {
             <span className="action-icon">💰</span>
             <span className="action-text">Análisis de Costos</span>
           </a>
-          <a href="http://localhost:5678" target="_blank" rel="noopener noreferrer" className="action-button">
+          <a href="https://wf.zynaptic.tech" target="_blank" rel="noopener noreferrer" className="action-button">
             <span className="action-icon">⚙️</span>
             <span className="action-text">Configurar n8n</span>
           </a>

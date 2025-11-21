@@ -1,0 +1,230 @@
+{
+  "name": "Nutridiab - Validar Token y Guardar Datos",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutridiab/validate-and-save",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-validate",
+      "name": "Webhook Validar Token",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Validar token\nSELECT * FROM nutridiab.validar_token('{{ $json.body.token }}');",
+        "options": {}
+      },
+      "id": "supabase-validate-token",
+      "name": "Supabase - Validar Token",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.valido }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-token-valid",
+      "name": "¿Token válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Actualizar datos del usuario\nUPDATE nutridiab.usuarios\nSET \n  nombre = '{{ $('Webhook Validar Token').item.json.body.nombre }}',\n  apellido = '{{ $('Webhook Validar Token').item.json.body.apellido }}',\n  email = '{{ $('Webhook Validar Token').item.json.body.email }}',\n  telefono = '{{ $('Webhook Validar Token').item.json.body.telefono }}',\n  fecha_nacimiento = '{{ $('Webhook Validar Token').item.json.body.fecha_nacimiento }}',\n  tipo_diabetes = '{{ $('Webhook Validar Token').item.json.body.tipo_diabetes }}',\n  anios_diagnostico = {{ $('Webhook Validar Token').item.json.body.anios_diagnostico || 'NULL' }},\n  usa_insulina = {{ $('Webhook Validar Token').item.json.body.usa_insulina || false }},\n  medicamentos = '{{ $('Webhook Validar Token').item.json.body.medicamentos }}',\n  datos_completos = TRUE,\n  updated_at = NOW()\nWHERE \"usuario ID\" = {{ $json.usuario_id }}\nRETURNING *;",
+        "options": {}
+      },
+      "id": "supabase-update-user",
+      "name": "Supabase - Actualizar Usuario",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 200],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Marcar token como usado\nSELECT nutridiab.usar_token('{{ $('Webhook Validar Token').item.json.body.token }}');",
+        "options": {}
+      },
+      "id": "supabase-use-token",
+      "name": "Supabase - Marcar Token Usado",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1050, 200],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  success: true,\n  message: 'Datos guardados exitosamente',\n  usuario: $('Supabase - Actualizar Usuario').first().json\n};"
+      },
+      "id": "code-success-response",
+      "name": "Respuesta Éxito",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  success: false,\n  error: 'Token inválido o expirado'\n};"
+      },
+      "id": "code-error-response",
+      "name": "Respuesta Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond-success",
+      "name": "Responder Éxito",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Responder Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    }
+  ],
+  "connections": {
+    "Webhook Validar Token": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Validar Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Validar Token": {
+      "main": [
+        [
+          {
+            "node": "¿Token válido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Token válido?": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Actualizar Usuario",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Actualizar Usuario": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Marcar Token Usado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Marcar Token Usado": {
+      "main": [
+        [
+          {
+            "node": "Respuesta Éxito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta Éxito": {
+      "main": [
+        [
+          {
+            "node": "Responder Éxito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta Error": {
+      "main": [
+        [
+          {
+            "node": "Responder Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-21T00:00:00.000Z",
+  "versionId": "1"
+}
+

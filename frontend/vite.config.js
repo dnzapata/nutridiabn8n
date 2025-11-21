@@ -8,8 +8,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/webhook': {
-        target: 'http://localhost:5678',
+        target: process.env.VITE_API_URL || 'https://wf.zynaptic.tech',
         changeOrigin: true,
+        secure: true,
       }
     }
   }

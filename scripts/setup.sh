@@ -47,7 +47,7 @@ docker-compose up -d
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ n8n iniciado correctamente${NC}"
-    echo -e "${BLUE}   Accede a n8n en: http://localhost:5678${NC}"
+    echo -e "${BLUE}   Accede a n8n en: https://wf.zynaptic.tech${NC}"
 else
     echo -e "${RED}❌ Error al iniciar n8n${NC}"
     exit 1
@@ -76,7 +76,7 @@ echo ""
 echo "📍 Próximos pasos:"
 echo ""
 echo "1. Configura n8n (primera vez):"
-echo -e "   ${BLUE}http://localhost:5678${NC}"
+echo -e "   ${BLUE}https://wf.zynaptic.tech${NC}"
 echo ""
 echo "2. Importa los workflows:"
 echo "   - Abre n8n"

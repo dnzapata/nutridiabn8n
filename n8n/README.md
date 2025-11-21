@@ -44,7 +44,7 @@ Verifica el estado del backend.
 ## 📝 Cómo Importar Workflows
 
 1. Inicia n8n: `docker-compose up -d`
-2. Accede a http://localhost:5678
+2. Accede a https://wf.zynaptic.tech
 3. Ve a **Workflows** → **Import from File**
 4. Selecciona los archivos JSON de la carpeta `workflows/`
 
@@ -82,7 +82,7 @@ Para producción, considera:
 ## 📊 Monitoreo
 
 Accede a las ejecuciones en:
-- http://localhost:5678/executions
+- https://wf.zynaptic.tech/executions
 
 Aquí puedes ver:
 - Historial de ejecuciones

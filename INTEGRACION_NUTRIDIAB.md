@@ -162,7 +162,7 @@ El archivo `vite.config.js` ya tiene un proxy configurado:
 ```javascript
 proxy: {
   '/webhook': {
-    target: 'http://localhost:5678',
+    target: 'https://wf.zynaptic.tech',
     changeOrigin: true,
   }
 }
@@ -282,7 +282,7 @@ if (apiKey !== validKey) {
 ### Test 1: Verificar Webhook de Stats
 
 ```bash
-curl http://localhost:5678/webhook/nutridiab/stats
+curl https://wf.zynaptic.tech/webhook/nutridiab/stats
 ```
 
 **Respuesta esperada**: JSON con estadísticas
@@ -464,7 +464,7 @@ server {
   }
 
   location /webhook/ {
-    proxy_pass http://localhost:5678/webhook/;
+    proxy_pass https://wf.zynaptic.tech/webhook/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
   }

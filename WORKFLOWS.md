@@ -58,7 +58,7 @@ Webhook → IF (GET/POST) → Code (lógica) → Respond
 
 ### Paso 1: Crear Workflow Nuevo
 
-1. Abre n8n: http://localhost:5678
+1. Abre n8n: https://wf.zynaptic.tech
 2. Click en **"Add workflow"** o el botón **"+"**
 3. Dale un nombre descriptivo (ej: "Get Users")
 
@@ -121,7 +121,7 @@ return { error: 'Método no soportado' };
 
 ```bash
 # En tu terminal o Postman
-curl http://localhost:5678/webhook/users
+curl https://wf.zynaptic.tech/webhook/users
 ```
 
 ## 🔄 Tipos de Workflows Comunes
@@ -383,10 +383,10 @@ return {
 
 ```bash
 # GET
-curl http://localhost:5678/webhook/test
+curl https://wf.zynaptic.tech/webhook/test
 
 # POST
-curl -X POST http://localhost:5678/webhook/test \
+curl -X POST https://wf.zynaptic.tech/webhook/test \
   -H "Content-Type: application/json" \
   -d '{"name":"Test","value":123}'
 ```

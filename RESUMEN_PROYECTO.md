@@ -155,7 +155,7 @@ npm run dev
 
 Listo! Ve a:
 - Frontend: http://localhost:5173
-- n8n: http://localhost:5678
+- n8n: https://wf.zynaptic.tech
 
 ### Opción 2: Sistema Completo (Con NutriDiab)
 
@@ -176,9 +176,9 @@ Ver guía completa en `INTEGRACION_NUTRIDIAB.md`
 |----------|-----|-------------|
 | **Frontend** | http://localhost:5173 | Aplicación React |
 | **Dashboard NutriDiab** | http://localhost:5173/dashboard | Admin del sistema |
-| **n8n Editor** | http://localhost:5678 | Editor de workflows |
-| **Health Check** | http://localhost:5678/webhook/health | Verificar backend |
-| **CRUD API** | http://localhost:5678/webhook/items | Ejemplo CRUD |
+| **n8n Editor** | https://wf.zynaptic.tech | Editor de workflows |
+| **Health Check** | https://wf.zynaptic.tech/webhook/health | Verificar backend |
+| **CRUD API** | https://wf.zynaptic.tech/webhook/items | Ejemplo CRUD |
 
 ---
 

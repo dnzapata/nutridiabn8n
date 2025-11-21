@@ -43,7 +43,7 @@ docker-compose up -d
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✓ n8n iniciado correctamente" -ForegroundColor Green
-    Write-Host "   Accede a n8n en: http://localhost:5678" -ForegroundColor Blue
+    Write-Host "   Accede a n8n en: https://wf.zynaptic.tech" -ForegroundColor Blue
 } else {
     Write-Host "❌ Error al iniciar n8n" -ForegroundColor Red
     exit 1
@@ -72,7 +72,7 @@ Write-Host ""
 Write-Host "📍 Próximos pasos:" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "1. Configura n8n (primera vez):"
-Write-Host "   http://localhost:5678" -ForegroundColor Blue
+Write-Host "   https://wf.zynaptic.tech" -ForegroundColor Blue
 Write-Host ""
 Write-Host "2. Importa los workflows:"
 Write-Host "   - Abre n8n"

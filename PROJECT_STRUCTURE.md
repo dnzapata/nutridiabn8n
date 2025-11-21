@@ -187,8 +187,8 @@ nutridiabn8n8/
 | Servicio | URL | Propósito |
 |----------|-----|-----------|
 | Frontend | http://localhost:5173 | Interfaz de usuario |
-| n8n Editor | http://localhost:5678 | Editor de workflows |
-| API Webhooks | http://localhost:5678/webhook/* | Endpoints REST |
+| n8n Editor | https://wf.zynaptic.tech | Editor de workflows |
+| API Webhooks | https://wf.zynaptic.tech/webhook/* | Endpoints REST |
 
 ### Rutas del Frontend
 

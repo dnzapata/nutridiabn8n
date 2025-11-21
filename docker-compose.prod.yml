@@ -23,7 +23,7 @@ services:
       - ./n8n/data:/home/node/.n8n
       - ./n8n/workflows:/workflows
     networks:
-      - nutridia-network
+      - nutridiab-network
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
       interval: 30s
@@ -34,7 +34,7 @@ services:
   # Opcional: Nginx como reverse proxy
   # nginx:
   #   image: nginx:alpine
-  #   container_name: nutridia-nginx
+  #   container_name: nutridiab-nginx
   #   restart: always
   #   ports:
   #     - "80:80"
@@ -45,9 +45,9 @@ services:
   #   depends_on:
   #     - n8n
   #   networks:
-  #     - nutridia-network
+  #     - nutridiab-network
 
 networks:
-  nutridia-network:
+  nutridiab-network:
     driver: bridge
 

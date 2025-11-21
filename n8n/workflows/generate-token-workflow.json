@@ -1,0 +1,102 @@
+{
+  "name": "Nutridiab - Generar Token Registro",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutridiab/generate-token",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-generate-token",
+      "name": "Webhook Generate Token",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Generar token único\nINSERT INTO nutridiab.tokens_acceso (\\\"usuario ID\\\", token, tipo, expira)\nVALUES (\n  {{ $json.usuario_id }},\n  encode(gen_random_bytes(32), 'hex'),\n  'registro',\n  NOW() + INTERVAL '24 hours'\n)\nRETURNING token, expira;",
+        "options": {}
+      },
+      "id": "supabase-generate-token",
+      "name": "Supabase - Generar Token",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const token = $input.first().json.token;\nconst expira = $input.first().json.expira;\nconst frontend_url = 'http://localhost:5173'; // Cambiar en producción\n\nconst enlace = `${frontend_url}/registro?token=${token}`;\n\nreturn {\n  success: true,\n  token: token,\n  enlace: enlace,\n  expira: expira,\n  mensaje: `📋 Para completar tu registro, ingresa a:\\n\\n${enlace}\\n\\n⏰ Este enlace es válido por 24 horas.`\n};"
+      },
+      "id": "code-build-response",
+      "name": "Construir Respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond-to-webhook",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Generate Token": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Generar Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Generar Token": {
+      "main": [
+        [
+          {
+            "node": "Construir Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-21T00:00:00.000Z",
+  "versionId": "1"
+}
+

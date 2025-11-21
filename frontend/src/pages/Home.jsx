@@ -99,8 +99,8 @@ function Home() {
             </li>
             <li>
               <strong>Accede a n8n:</strong> 
-              <a href="http://localhost:5678" target="_blank" rel="noopener noreferrer">
-                http://localhost:5678
+              <a href="https://wf.zynaptic.tech" target="_blank" rel="noopener noreferrer">
+                https://wf.zynaptic.tech
               </a>
             </li>
             <li>

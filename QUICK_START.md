@@ -17,8 +17,8 @@ Asegúrate de tener instalado:
 El archivo `.env` ya está creado con valores por defecto. Si necesitas modificarlo:
 
 ```env
-N8N_PORT=5678
-VITE_API_URL=http://localhost:5678
+N8N_PORT=443
+VITE_API_URL=https://wf.zynaptic.tech
 ```
 
 ### 2️⃣ Iniciar n8n Backend (1 minuto)
@@ -30,11 +30,11 @@ docker-compose up -d
 
 Espera a que el contenedor inicie (verás el log "Editor is now accessible").
 
-✅ Verifica: Abre http://localhost:5678 en tu navegador
+✅ Verifica: Abre https://wf.zynaptic.tech en tu navegador
 
 ### 3️⃣ Configurar n8n Primera Vez (2 minutos)
 
-1. Abre http://localhost:5678
+1. Abre https://wf.zynaptic.tech
 2. Completa el formulario de registro (solo primera vez)
 3. Importa los workflows de ejemplo:
    - Click en **"Workflows"** en el menú
@@ -64,7 +64,7 @@ Tu aplicación está corriendo. Ahora puedes:
 
 1. **Ver la página de inicio**: http://localhost:5173
 2. **Probar el CRUD**: http://localhost:5173/items
-3. **Editar workflows**: http://localhost:5678
+3. **Editar workflows**: https://wf.zynaptic.tech
 
 ## 🧪 Verificar que Todo Funciona
 
@@ -101,7 +101,7 @@ docker-compose logs -f
 ### Error: "Cannot GET /webhook/health"
 
 El workflow no está activo en n8n:
-1. Ve a http://localhost:5678
+1. Ve a https://wf.zynaptic.tech
 2. Abre el workflow "Health Check"
 3. Activa el toggle en la esquina superior derecha
 4. Debería aparecer en verde "Active"
@@ -164,8 +164,8 @@ docker-compose up -d --build
 ### Estructura de URLs
 
 - **Frontend**: http://localhost:5173
-- **n8n Editor**: http://localhost:5678
-- **Webhooks**: http://localhost:5678/webhook/{nombre}
+- **n8n Editor**: https://wf.zynaptic.tech
+- **Webhooks**: https://wf.zynaptic.tech/webhook/{nombre}
 
 ### Archivos Importantes
 

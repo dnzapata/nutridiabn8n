@@ -1,7 +1,7 @@
 // Constantes de la aplicación
 
 export const APP_NAME = import.meta.env.VITE_APP_NAME || 'Nutridiab';
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5678';
+export const API_URL = import.meta.env.VITE_API_URL || 'https://wf.zynaptic.tech';
 export const ENV = import.meta.env.VITE_ENV || 'development';
 
 // Endpoints

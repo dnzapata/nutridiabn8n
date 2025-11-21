@@ -106,7 +106,7 @@ El script hace TODO automáticamente ✨
 docker-compose up -d
 
 # 2. Acceder a n8n
-# Abre: http://localhost:5678
+# Abre: https://wf.zynaptic.tech
 # Completa el registro
 
 # 3. Importar tu workflow
@@ -201,8 +201,8 @@ Una vez que tengas todo corriendo:
 |----------|-----|-------------|
 | **Frontend** | http://localhost:5173 | Tu aplicación React |
 | **Dashboard NutriDiab** | http://localhost:5173/dashboard | Panel de admin 🩺 |
-| **n8n Editor** | http://localhost:5678 | Editor de workflows |
-| **Health API** | http://localhost:5678/webhook/health | Test de conexión |
+| **n8n Editor** | https://wf.zynaptic.tech | Editor de workflows |
+| **Health API** | https://wf.zynaptic.tech/webhook/health | Test de conexión |
 
 ---
 
@@ -388,7 +388,7 @@ cd frontend && npm install && npm run dev
 **Luego abre:**
 - Frontend: http://localhost:5173
 - Dashboard: http://localhost:5173/dashboard 🩺
-- n8n: http://localhost:5678
+- n8n: https://wf.zynaptic.tech
 
 ---
 

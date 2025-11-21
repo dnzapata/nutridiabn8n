@@ -124,7 +124,7 @@ function About() {
         <p>Consulta la documentación en el README.md del proyecto</p>
         <div className="cta-buttons">
           <a 
-            href="http://localhost:5678" 
+            href="https://wf.zynaptic.tech" 
             target="_blank" 
             rel="noopener noreferrer"
             className="btn btn-primary"

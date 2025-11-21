@@ -55,10 +55,10 @@ El archivo `.env` ya existe con configuración por defecto. Si quieres personali
 N8N_PORT=5678
 
 # URL del API para el frontend
-VITE_API_URL=http://localhost:5678
+VITE_API_URL=https://wf.zynaptic.tech
 
 # Nombre de la aplicación
-VITE_APP_NAME=NutriDia
+VITE_APP_NAME=Nutridiab
 ```
 
 ---
@@ -83,13 +83,13 @@ docker-compose logs -f
 ```
 
 **Acceder a n8n:**
-Abre tu navegador en: http://localhost:5678
+Abre tu navegador en: https://wf.zynaptic.tech
 
 ---
 
 ### Paso 3: Configurar n8n (Primera vez) 🔧
 
-1. **Abre n8n**: http://localhost:5678
+1. **Abre n8n**: https://wf.zynaptic.tech
 
 2. **Completa el registro** (primera vez):
    - Email
@@ -221,7 +221,7 @@ Tu aplicación está funcionando correctamente. Ahora puedes:
 ### 🛠️ Desarrollar
 
 1. **Crear nuevas páginas** en `frontend/src/pages/`
-2. **Crear workflows** en n8n (http://localhost:5678)
+2. **Crear workflows** en n8n (https://wf.zynaptic.tech)
 3. **Agregar componentes** en `frontend/src/components/`
 4. **Definir endpoints** en n8n workflows
 
@@ -314,9 +314,9 @@ Una vez que todo está funcionando:
 | Servicio | URL | Para qué sirve |
 |----------|-----|----------------|
 | **Frontend** | http://localhost:5173 | Tu aplicación React |
-| **n8n Editor** | http://localhost:5678 | Crear/editar workflows |
-| **API Health** | http://localhost:5678/webhook/health | Verificar backend |
-| **API Items** | http://localhost:5678/webhook/items | Endpoint CRUD |
+| **n8n Editor** | https://wf.zynaptic.tech | Crear/editar workflows |
+| **API Health** | https://wf.zynaptic.tech/webhook/health | Verificar backend |
+| **API Items** | https://wf.zynaptic.tech/webhook/items | Endpoint CRUD |
 
 ---
 
