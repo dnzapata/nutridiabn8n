@@ -1,8 +1,8 @@
-# 🩺 NutriDiab - Workflow de Análisis Nutricional para Diabéticos
+# 🩺 Nutridiab - Workflow de Análisis Nutricional para Diabéticos
 
 ## 📋 Descripción General
 
-**NutriDiab** es un asistente de IA especializado en nutrición para personas con diabetes tipo 1 y 2. Funciona vía WhatsApp y puede analizar alimentos mediante:
+**Nutridiab** es un asistente de IA especializado en nutrición para personas con diabetes tipo 1 y 2. Funciona vía WhatsApp y puede analizar alimentos mediante:
 
 - 📝 **Texto**: Descripción del alimento ("Una empanada de carne")
 - 📸 **Imagen**: Foto del plato de comida
@@ -423,5 +423,5 @@ Siempre consulta con tu médico o nutricionista antes de hacer cambios en tu die
 
 **Versión**: 1.0  
 **Última actualización**: 2025-11-20  
-**Autor**: NutriDia Team
+**Autor**: Nutridiab Team
 

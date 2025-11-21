@@ -1,7 +1,7 @@
-# Script de configuración inicial para NutriDia (PowerShell)
-# Para Windows
+# Script de configuración inicial para Nutridiab (PowerShell)
+# Para Windows - Aplicación de control nutricional para diabéticos
 
-Write-Host "🚀 Configurando NutriDia..." -ForegroundColor Cyan
+Write-Host "🚀 Configurando Nutridiab..." -ForegroundColor Cyan
 Write-Host ""
 
 # Verificar Docker

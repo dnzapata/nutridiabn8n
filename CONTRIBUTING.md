@@ -1,6 +1,6 @@
 # Guía de Contribución
 
-¡Gracias por tu interés en contribuir a NutriDia! 🎉
+¡Gracias por tu interés en contribuir a Nutridiab! 🎉
 
 ## 🚀 Cómo Contribuir
 
@@ -212,7 +212,7 @@ Si tienes preguntas sobre cómo contribuir:
 
 ## 🙏 Agradecimientos
 
-Cada contribución, grande o pequeña, es valiosa. ¡Gracias por hacer de NutriDia un mejor proyecto!
+Cada contribución, grande o pequeña, es valiosa. ¡Gracias por hacer de Nutridiab un mejor proyecto!
 
 ---
 

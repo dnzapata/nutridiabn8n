@@ -1,8 +1,8 @@
-# 🔐 Flujo de Verificación de Usuario - NutriDiab
+# 🔐 Flujo de Verificación de Usuario - Nutridiab
 
 ## 📋 Descripción
 
-Este documento explica el flujo completo de verificación de datos del usuario antes de permitirle usar NutriDiab.
+Este documento explica el flujo completo de verificación de datos del usuario antes de permitirle usar Nutridiab (aplicación de control nutricional para diabéticos).
 
 ---
 

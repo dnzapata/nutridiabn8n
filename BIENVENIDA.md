@@ -1,4 +1,4 @@
-# 🎊 ¡Bienvenido a tu Proyecto NutriDia + n8n!
+# 🎊 ¡Bienvenido a tu Proyecto Nutridiab + n8n!
 
 ```
  ███╗   ██╗██╗   ██╗████████╗██████╗ ██╗██████╗ ██╗ █████╗ 
@@ -333,7 +333,7 @@ docker-compose restart
 
 ## 🌟 Características Únicas de tu Proyecto
 
-### Lo que hace especial a NutriDiab:
+### Lo que hace especial a Nutridiab:
 
 1. **Multimodal** 🎭
    - Texto, imagen Y audio
@@ -361,7 +361,7 @@ docker-compose restart
 
 Tienes todo lo necesario para:
 
-✅ Administrar tu sistema NutriDiab  
+✅ Administrar tu sistema Nutridiab  
 ✅ Ver estadísticas y métricas  
 ✅ Gestionar usuarios  
 ✅ Analizar costos  
@@ -410,7 +410,7 @@ cd frontend && npm install && npm run dev
 
 ---
 
-**Creado con ❤️ para NutriDia**  
+**Creado con ❤️ para Nutridiab**  
 **Versión**: 1.0  
 **Fecha**: 2025-11-20
 

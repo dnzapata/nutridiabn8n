@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Script de configuración inicial para NutriDia
+# Script de configuración inicial para Nutridiab
 # Este script facilita la configuración del proyecto
+# Aplicación de control nutricional para diabéticos
 
-echo "🚀 Configurando NutriDia..."
+echo "🚀 Configurando Nutridiab..."
 echo ""
 
 # Colores para output

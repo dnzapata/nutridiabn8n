@@ -1,6 +1,6 @@
-# 🔗 Guía de Integración - NutriDiab Frontend + n8n
+# 🔗 Guía de Integración - Nutridiab Frontend + n8n
 
-Esta guía explica cómo integrar el frontend React con tu workflow de NutriDiab en n8n.
+Esta guía explica cómo integrar el frontend React con tu workflow de Nutridiab en n8n.
 
 ---
 
@@ -32,7 +32,7 @@ Tu workflow actual maneja mensajes de WhatsApp. Necesitamos crear **workflows ad
 
 ### Workflow: Dashboard Stats
 
-**Nombre**: `NutriDiab Admin - Stats`  
+**Nombre**: `Nutridiab Admin - Stats`  
 **Endpoint**: `GET /webhook/nutridiab/stats`
 
 ```javascript

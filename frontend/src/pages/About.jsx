@@ -4,16 +4,17 @@ function About() {
   return (
     <div className="about-page">
       <div className="hero-about">
-        <h1>Acerca de NutriDia</h1>
-        <p>Sistema de gestión nutricional con arquitectura moderna</p>
+        <h1>Acerca de Nutridiab</h1>
+        <p>Sistema de control nutricional para diabéticos con arquitectura moderna</p>
       </div>
 
       <div className="card">
         <h2>🎯 ¿Qué es este proyecto?</h2>
         <p>
-          NutriDia es una Single Page Application (SPA) construida con React que utiliza 
-          n8n como backend. Esta arquitectura permite crear workflows visuales para manejar 
-          toda la lógica de negocio sin necesidad de escribir un backend tradicional.
+          Nutridiab es una Single Page Application (SPA) construida con React que utiliza 
+          n8n como backend. Esta aplicación para el control nutricional de diabéticos permite 
+          crear workflows visuales para manejar toda la lógica de negocio sin necesidad de 
+          escribir un backend tradicional.
         </p>
       </div>
 

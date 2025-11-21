@@ -1,6 +1,6 @@
-# NutriDia Frontend
+# Nutridiab Frontend
 
-Frontend de la aplicación NutriDia construido con React + Vite.
+Frontend de la aplicación Nutridiab construido con React + Vite. **Aplicación para el control nutricional de diabéticos**.
 
 ## 🚀 Inicio Rápido
 

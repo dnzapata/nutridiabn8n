@@ -1,6 +1,6 @@
-# NutriDia - SPA React + n8n Backend
+# Nutridiab - SPA React + n8n Backend
 
-Proyecto Full Stack utilizando React como frontend y n8n como backend para automatización y lógica de negocio.
+Proyecto Full Stack utilizando React como frontend y n8n como backend para automatización y lógica de negocio. **Aplicación para el control nutricional de diabéticos**.
 
 ## 🚀 Estructura del Proyecto
 
@@ -132,9 +132,9 @@ cd frontend && npm run build
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-## 🩺 NutriDiab - Proyecto Destacado
+## 🩺 Nutridiab - Proyecto Destacado
 
-Este repositorio incluye **NutriDiab**, un asistente de IA completo para análisis nutricional:
+Este repositorio incluye **Nutridiab**, un asistente de IA completo para análisis nutricional de personas con diabetes:
 
 ### Características:
 - 💬 Chatbot vía WhatsApp

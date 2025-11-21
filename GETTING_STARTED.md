@@ -1,6 +1,6 @@
-# 🎯 Guía de Inicio - NutriDia
+# 🎯 Guía de Inicio - Nutridiab
 
-¡Bienvenido a tu nuevo proyecto React + n8n! Esta guía te llevará paso a paso desde cero hasta tener tu aplicación funcionando.
+¡Bienvenido a tu nuevo proyecto React + n8n! Esta guía te llevará paso a paso desde cero hasta tener tu aplicación funcionando. **Aplicación para el control nutricional de diabéticos**.
 
 ---
 
@@ -163,7 +163,7 @@ http://localhost:5173
 
 Ve a: http://localhost:5173
 
-Deberías ver la página de inicio de NutriDia con:
+Deberías ver la página de inicio de Nutridiab con:
 - Navbar verde con logo
 - Sección "Estado del Backend"
 - Cards de características
@@ -454,7 +454,7 @@ Ya tienes todo configurado. ¡Es hora de crear algo increíble!
 
 ---
 
-**Proyecto**: NutriDia  
+**Proyecto**: Nutridiab - Control Nutricional para Diabéticos  
 **Stack**: React + n8n  
 **Versión**: 1.0.0  
 **Última actualización**: 2025-11-20

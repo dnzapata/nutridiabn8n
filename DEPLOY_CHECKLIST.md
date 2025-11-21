@@ -1,6 +1,6 @@
-# ✅ Checklist de Deploy - NutriDiab en Dokploy
+# ✅ Checklist de Deploy - Nutridiab en Dokploy
 
-Usa esta lista para asegurarte de completar todos los pasos del deploy.
+Usa esta lista para asegurarte de completar todos los pasos del deploy. **Nutridiab: aplicación de control nutricional para diabéticos**.
 
 ---
 

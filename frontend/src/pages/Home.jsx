@@ -28,9 +28,9 @@ function Home() {
   return (
     <div className="home">
       <div className="hero">
-        <h1>🥗 Bienvenido a NutriDia</h1>
+        <h1>🩺 Bienvenido a Nutridiab</h1>
         <p className="hero-subtitle">
-          Gestión nutricional inteligente con React + n8n
+          Control nutricional inteligente para diabéticos con React + n8n
         </p>
       </div>
 

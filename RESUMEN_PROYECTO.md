@@ -1,8 +1,8 @@
-# 📦 Resumen del Proyecto - NutriDia n8n
+# 📦 Resumen del Proyecto - Nutridiab n8n
 
 ## 🎯 ¿Qué es este proyecto?
 
-**NutriDia** es una plataforma completa que combina:
+**Nutridiab** es una plataforma completa que combina:
 
 1. **Frontend React moderno** - SPA con interfaz de administración
 2. **Backend n8n visual** - Workflows sin código
@@ -405,5 +405,5 @@ Tienes a tu disposición:
 
 **Versión**: 1.0  
 **Fecha**: 2025-11-20  
-**Autor**: Equipo NutriDia
+**Autor**: Equipo Nutridiab
 

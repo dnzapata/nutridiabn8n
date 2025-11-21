@@ -1,6 +1,6 @@
-# 🚀 Deploy de NutriDiab en Dokploy (Hostinger VPS)
+# 🚀 Deploy de Nutridiab en Dokploy (Hostinger VPS)
 
-Esta guía te ayudará a desplegar tu workflow NutriDiab usando Dokploy en un VPS de Hostinger.
+Esta guía te ayudará a desplegar tu workflow Nutridiab (aplicación de control nutricional para diabéticos) usando Dokploy en un VPS de Hostinger.
 
 ---
 

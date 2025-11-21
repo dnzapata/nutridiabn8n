@@ -7,7 +7,7 @@ function Layout({ children }) {
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/" className="navbar-brand">
-            🥗 NutriDia
+            🩺 Nutridiab
           </Link>
           <ul className="navbar-menu">
             <li>
@@ -38,7 +38,7 @@ function Layout({ children }) {
       </main>
       <footer className="footer">
         <div className="footer-container">
-          <p>© 2025 NutriDia - Powered by React + n8n</p>
+          <p>© 2025 Nutridiab - Control Nutricional para Diabéticos - Powered by React + n8n</p>
         </div>
       </footer>
     </div>

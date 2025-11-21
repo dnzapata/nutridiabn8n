@@ -1,6 +1,6 @@
 # 📂 Estructura del Proyecto
 
-Este documento describe la organización completa del proyecto NutriDia.
+Este documento describe la organización completa del proyecto Nutridiab.
 
 ## 🌳 Árbol de Directorios
 

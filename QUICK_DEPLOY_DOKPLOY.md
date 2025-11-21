@@ -1,6 +1,6 @@
-# ⚡ Deploy Rápido en Dokploy - NutriDiab
+# ⚡ Deploy Rápido en Dokploy - Nutridiab
 
-Guía ultra-rápida para desplegar en Dokploy. Para detalles completos ver `DEPLOY_DOKPLOY.md`.
+Guía ultra-rápida para desplegar Nutridiab (control nutricional para diabéticos) en Dokploy. Para detalles completos ver `DEPLOY_DOKPLOY.md`.
 
 ---
 

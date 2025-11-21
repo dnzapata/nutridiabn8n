@@ -1,6 +1,6 @@
 # ⚡ Cómo Implementar la Verificación de Usuario
 
-Guía rápida para agregar el flujo de verificación al workflow existente de NutriDiab.
+Guía rápida para agregar el flujo de verificación al workflow existente de Nutridiab (aplicación de control nutricional para diabéticos).
 
 ---
 
