@@ -1,0 +1,72 @@
+{
+  "name": "Nutridiab - Admin Usuarios",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nutridiab/admin/usuarios",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-usuarios",
+      "name": "Webhook Usuarios",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Lista de usuarios con estadísticas\nSELECT \n  u.\"usuario ID\",\n  u.nombre,\n  u.apellido,\n  u.email,\n  u.\"remoteJid\",\n  u.\"AceptoTerminos\",\n  u.datos_completos,\n  u.email_verificado,\n  u.\"Activo\",\n  u.\"Bloqueado\",\n  u.tipo_diabetes,\n  u.created_at,\n  u.ultimo_acceso,\n  COUNT(c.id) as total_consultas,\n  COALESCE(SUM(c.\"Costo\"), 0) as costo_total,\n  MAX(c.created_at) as ultima_consulta\nFROM nutridiab.usuarios u\nLEFT JOIN nutridiab.\"Consultas\" c ON u.\"usuario ID\" = c.\"usuario ID\"\nGROUP BY u.\"usuario ID\"\nORDER BY u.created_at DESC\nLIMIT 100;",
+        "options": {}
+      },
+      "id": "postgres-usuarios",
+      "name": "Postgres Usuarios",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Supabase - Nutridiab"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Usuarios": {
+      "main": [
+        [
+          {
+            "node": "Postgres Usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Usuarios": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
+

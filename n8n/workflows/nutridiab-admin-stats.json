@@ -1,0 +1,72 @@
+{
+  "name": "Nutridiab - Admin Stats",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nutridiab/admin/stats",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-stats",
+      "name": "Webhook Stats",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Estadísticas generales\nSELECT \n  (SELECT COUNT(*) FROM nutridiab.usuarios) as total_usuarios,\n  (SELECT COUNT(*) FROM nutridiab.usuarios WHERE \"Activo\" = TRUE) as usuarios_activos,\n  (SELECT COUNT(*) FROM nutridiab.\"Consultas\") as total_consultas,\n  (SELECT COALESCE(SUM(\"Costo\"), 0) FROM nutridiab.\"Consultas\") as costo_total,\n  (SELECT COUNT(*) FROM nutridiab.\"Consultas\" WHERE created_at >= CURRENT_DATE) as consultas_hoy,\n  (SELECT COUNT(*) FROM nutridiab.usuarios WHERE created_at >= CURRENT_DATE) as usuarios_hoy,\n  (SELECT COUNT(*) FROM nutridiab.\"Consultas\" WHERE tipo = 'texto') as consultas_texto,\n  (SELECT COUNT(*) FROM nutridiab.\"Consultas\" WHERE tipo = 'imagen') as consultas_imagen,\n  (SELECT COUNT(*) FROM nutridiab.\"Consultas\" WHERE tipo = 'audio') as consultas_audio;",
+        "options": {}
+      },
+      "id": "postgres-stats",
+      "name": "Postgres Stats",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Supabase - Nutridiab"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Stats": {
+      "main": [
+        [
+          {
+            "node": "Postgres Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Stats": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
+

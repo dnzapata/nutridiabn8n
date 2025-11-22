@@ -1,0 +1,72 @@
+{
+  "name": "Nutridiab - Admin Consultas Recientes",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nutridiab/admin/consultas",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-consultas",
+      "name": "Webhook Consultas",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Consultas recientes con datos de usuario\nSELECT \n  c.id,\n  c.tipo,\n  c.resultado,\n  c.\"Costo\",\n  c.created_at,\n  u.nombre,\n  u.apellido,\n  u.email\nFROM nutridiab.\"Consultas\" c\nJOIN nutridiab.usuarios u ON c.\"usuario ID\" = u.\"usuario ID\"\nORDER BY c.created_at DESC\nLIMIT {{ $json.query.limit || 50 }};",
+        "options": {}
+      },
+      "id": "postgres-consultas",
+      "name": "Postgres Consultas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Supabase - Nutridiab"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Consultas": {
+      "main": [
+        [
+          {
+            "node": "Postgres Consultas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Consultas": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
+

@@ -15,58 +15,65 @@ function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      // En producción, estos datos vendrían de los endpoints de n8n
-      // Por ahora mostramos datos de ejemplo
-      const mockStats = {
-        totalUsers: 127,
-        totalConsultas: 1543,
-        totalCost: 45.67,
-        avgCostPerQuery: 0.0296,
-        consultasHoy: 34,
-        newUsersToday: 5,
+      
+      // Obtener estadísticas reales desde n8n
+      const statsData = await nutridiabApi.getStats();
+      
+      // Transformar datos de Supabase al formato del componente
+      const transformedStats = {
+        totalUsers: statsData.total_usuarios || 0,
+        totalConsultas: statsData.total_consultas || 0,
+        totalCost: parseFloat(statsData.costo_total) || 0,
+        avgCostPerQuery: statsData.total_consultas > 0 
+          ? (parseFloat(statsData.costo_total) / statsData.total_consultas).toFixed(4)
+          : 0,
+        consultasHoy: statsData.consultas_hoy || 0,
+        newUsersToday: statsData.usuarios_hoy || 0,
         tipoStats: {
-          texto: 856,
-          imagen: 412,
-          audio: 275
+          texto: statsData.consultas_texto || 0,
+          imagen: statsData.consultas_imagen || 0,
+          audio: statsData.consultas_audio || 0
         }
       };
 
-      const mockActivity = [
-        {
-          id: 1,
-          usuario: 'Juan Pérez',
-          tipo: 'texto',
-          consulta: 'Una empanada de carne',
-          resultado: '~25g de hidratos',
-          fecha: new Date().toISOString(),
-          costo: 0.002
-        },
-        {
-          id: 2,
-          usuario: 'María González',
-          tipo: 'imagen',
-          consulta: 'Foto de plato de pasta',
-          resultado: '~65g de hidratos',
-          fecha: new Date(Date.now() - 300000).toISOString(),
-          costo: 0.015
-        },
-        {
-          id: 3,
-          usuario: 'Carlos López',
-          tipo: 'audio',
-          consulta: 'Audio: Pizza mediana',
-          resultado: '~80g de hidratos',
-          fecha: new Date(Date.now() - 600000).toISOString(),
-          costo: 0.008
-        }
-      ];
+      // Obtener actividad reciente
+      const consultasRecientes = await nutridiabApi.getRecentQueries(10);
+      
+      const transformedActivity = consultasRecientes.map(consulta => ({
+        id: consulta.id,
+        usuario: consulta.nombre && consulta.apellido 
+          ? `${consulta.nombre} ${consulta.apellido}` 
+          : consulta.email || 'Usuario',
+        tipo: consulta.tipo,
+        consulta: consulta.resultado ? consulta.resultado.substring(0, 50) + '...' : 'Sin resultado',
+        resultado: consulta.resultado || 'Procesando...',
+        fecha: consulta.created_at,
+        costo: parseFloat(consulta.Costo) || 0
+      }));
 
-      setStats(mockStats);
-      setRecentActivity(mockActivity);
+      setStats(transformedStats);
+      setRecentActivity(transformedActivity);
       setError(null);
     } catch (err) {
-      setError('Error al cargar el dashboard');
-      console.error('Error:', err);
+      console.error('Error al cargar dashboard:', err);
+      setError('Error al cargar el dashboard. Verifica que los workflows de n8n estén activos.');
+      
+      // Fallback a datos de ejemplo si hay error
+      const mockStats = {
+        totalUsers: 0,
+        totalConsultas: 0,
+        totalCost: 0,
+        avgCostPerQuery: 0,
+        consultasHoy: 0,
+        newUsersToday: 0,
+        tipoStats: {
+          texto: 0,
+          imagen: 0,
+          audio: 0
+        }
+      };
+      setStats(mockStats);
+      setRecentActivity([]);
     } finally {
       setLoading(false);
     }

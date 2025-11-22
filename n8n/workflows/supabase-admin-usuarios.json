@@ -1,0 +1,88 @@
+{
+  "name": "Nutridiab - Admin Usuarios (Supabase)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "nutridiab/admin/usuarios",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-usuarios",
+      "name": "Webhook Usuarios",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "rpc",
+        "functionName": "rpc_lista_usuarios",
+        "parameters": {
+          "parameters": [
+            {
+              "name": "p_limit",
+              "value": "={{ $json.query.limit || 100 }}"
+            }
+          ]
+        }
+      },
+      "id": "supabase-usuarios",
+      "name": "Supabase - Lista Usuarios",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "YOUR_SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase Nutridiab"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Usuarios": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Lista Usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Lista Usuarios": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-22T00:00:00.000Z",
+  "versionId": "2"
+}
+
