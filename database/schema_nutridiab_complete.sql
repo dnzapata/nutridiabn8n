@@ -426,21 +426,22 @@ ALTER TABLE nutridiab."Consultas" DISABLE ROW LEVEL SECURITY;
 ALTER TABLE nutridiab.mensajes DISABLE ROW LEVEL SECURITY;
 ALTER TABLE nutridiab.tokens_acceso DISABLE ROW LEVEL SECURITY;
 
--- 9. Si existe el rol 'anon' o 'authenticated' (Supabase), otorgar permisos básicos
+-- 9. Si usas un usuario específico para aplicaciones (recomendado)
+-- Descomenta y reemplaza 'app_user' con tu usuario:
+/*
 DO $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
-    GRANT USAGE ON SCHEMA nutridiab TO anon;
-    GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA nutridiab TO anon;
-    GRANT USAGE ON ALL SEQUENCES IN SCHEMA nutridiab TO anon;
-  END IF;
-  
-  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
-    GRANT USAGE ON SCHEMA nutridiab TO authenticated;
-    GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA nutridiab TO authenticated;
-    GRANT USAGE ON ALL SEQUENCES IN SCHEMA nutridiab TO authenticated;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'app_user') THEN
+    GRANT USAGE ON SCHEMA nutridiab TO app_user;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA nutridiab TO app_user;
+    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA nutridiab TO app_user;
+    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA nutridiab TO app_user;
+    
+    ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_user;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT USAGE, SELECT ON SEQUENCES TO app_user;
   END IF;
 END $$;
+*/
 
 -- ============================================
 -- VERIFICACIÓN DE INTEGRIDAD
@@ -468,10 +469,8 @@ BEGIN
   RAISE NOTICE '✅ Funciones: generar_token, validar_token, usar_token, verificar_datos_usuario, puede_usar_servicio, bloquear_usuario, activar_usuario';
   RAISE NOTICE '✅ Vista: vista_usuarios_estado';
   RAISE NOTICE '✅ Permisos configurados para postgres';
-  RAISE NOTICE '✅ RLS desactivado';
   RAISE NOTICE '';
-  RAISE NOTICE '🔐 IMPORTANTE: Resetea el password de la base de datos en Supabase Dashboard';
-  RAISE NOTICE '📝 Settings → Database → Reset database password';
+  RAISE NOTICE '📝 SIGUIENTE PASO: Verifica la conexión desde n8n o tu aplicación';
 END $$;
 
 -- ============================================
