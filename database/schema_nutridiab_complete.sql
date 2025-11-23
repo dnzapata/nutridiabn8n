@@ -386,39 +386,39 @@ GROUP BY u."usuario ID";
 -- VALUES ('5491155555555@s.whatsapp.net', 'Juan', 'Pérez', 'juan@example.com', 'tipo2', TRUE, TRUE, TRUE);
 
 -- ============================================
--- PERMISOS COMPLETOS PARA POSTGRES Y CONEXIONES EXTERNAS
+-- PERMISOS COMPLETOS PARA USUARIO dnzapata
 -- ============================================
 -- Estos permisos son CRÍTICOS para que n8n pueda conectarse
 
 -- 1. Permisos sobre el schema
-GRANT USAGE ON SCHEMA nutridiab TO postgres;
-GRANT ALL PRIVILEGES ON SCHEMA nutridiab TO postgres;
+GRANT USAGE ON SCHEMA nutridiab TO dnzapata;
+GRANT ALL PRIVILEGES ON SCHEMA nutridiab TO dnzapata;
 
 -- 2. Permisos sobre todas las tablas
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA nutridiab TO postgres;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA nutridiab TO dnzapata;
 
 -- 3. Permisos sobre secuencias (para IDs autoincrementales)
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA nutridiab TO postgres;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA nutridiab TO dnzapata;
 
 -- 4. Permisos sobre funciones
-GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA nutridiab TO postgres;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA nutridiab TO dnzapata;
 
--- 5. Cambiar owner de todas las tablas a postgres (MUY IMPORTANTE)
-ALTER TABLE nutridiab.usuarios OWNER TO postgres;
-ALTER TABLE nutridiab."Consultas" OWNER TO postgres;
-ALTER TABLE nutridiab.mensajes OWNER TO postgres;
-ALTER TABLE nutridiab.tokens_acceso OWNER TO postgres;
+-- 5. Cambiar owner de todas las tablas a dnzapata (MUY IMPORTANTE)
+ALTER TABLE nutridiab.usuarios OWNER TO dnzapata;
+ALTER TABLE nutridiab."Consultas" OWNER TO dnzapata;
+ALTER TABLE nutridiab.mensajes OWNER TO dnzapata;
+ALTER TABLE nutridiab.tokens_acceso OWNER TO dnzapata;
 
 -- 6. Cambiar owner de secuencias
-ALTER SEQUENCE nutridiab.usuarios_usuario\ ID_seq OWNER TO postgres;
-ALTER SEQUENCE nutridiab."Consultas_id_seq" OWNER TO postgres;
-ALTER SEQUENCE nutridiab.mensajes_id_seq OWNER TO postgres;
-ALTER SEQUENCE nutridiab.tokens_acceso_id_seq OWNER TO postgres;
+ALTER SEQUENCE nutridiab.usuarios_usuario\ ID_seq OWNER TO dnzapata;
+ALTER SEQUENCE nutridiab."Consultas_id_seq" OWNER TO dnzapata;
+ALTER SEQUENCE nutridiab.mensajes_id_seq OWNER TO dnzapata;
+ALTER SEQUENCE nutridiab.tokens_acceso_id_seq OWNER TO dnzapata;
 
 -- 7. Permisos por defecto para objetos futuros
-ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON FUNCTIONS TO postgres;
+ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON TABLES TO dnzapata;
+ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON SEQUENCES TO dnzapata;
+ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON FUNCTIONS TO dnzapata;
 
 -- 8. CRÍTICO: Desactivar RLS (Row Level Security) para conexiones externas
 ALTER TABLE nutridiab.usuarios DISABLE ROW LEVEL SECURITY;
@@ -426,22 +426,25 @@ ALTER TABLE nutridiab."Consultas" DISABLE ROW LEVEL SECURITY;
 ALTER TABLE nutridiab.mensajes DISABLE ROW LEVEL SECURITY;
 ALTER TABLE nutridiab.tokens_acceso DISABLE ROW LEVEL SECURITY;
 
--- 9. Si usas un usuario específico para aplicaciones (recomendado)
--- Descomenta y reemplaza 'app_user' con tu usuario:
-/*
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'app_user') THEN
-    GRANT USAGE ON SCHEMA nutridiab TO app_user;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA nutridiab TO app_user;
-    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA nutridiab TO app_user;
-    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA nutridiab TO app_user;
-    
-    ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_user;
-    ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT USAGE, SELECT ON SEQUENCES TO app_user;
-  END IF;
-END $$;
-*/
+-- 9. Permisos adicionales para el schema público (si es necesario)
+GRANT USAGE ON SCHEMA public TO dnzapata;
+
+-- 10. Permisos sobre vistas
+GRANT ALL PRIVILEGES ON ALL VIEWS IN SCHEMA nutridiab TO dnzapata;
+
+-- 11. Cambiar owner del schema (IMPORTANTE)
+ALTER SCHEMA nutridiab OWNER TO dnzapata;
+
+-- 12. Permisos sobre funciones específicas
+GRANT EXECUTE ON FUNCTION nutridiab.generar_token() TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.validar_token(VARCHAR) TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.usar_token(VARCHAR) TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.verificar_datos_usuario(INTEGER) TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.puede_usar_servicio(INTEGER) TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.bloquear_usuario(INTEGER, TEXT) TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.activar_usuario(INTEGER) TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.limpiar_tokens_expirados() TO dnzapata;
+GRANT EXECUTE ON FUNCTION nutridiab.actualizar_timestamp() TO dnzapata;
 
 -- ============================================
 -- VERIFICACIÓN DE INTEGRIDAD
@@ -458,19 +461,29 @@ BEGIN
   ASSERT (SELECT COUNT(*) FROM nutridiab.mensajes) >= 10,
     'ERROR: Mensajes no insertados correctamente';
   
-  -- Verificar permisos
-  ASSERT (SELECT has_schema_privilege('postgres', 'nutridiab', 'USAGE')),
-    'ERROR: postgres no tiene permisos sobre schema nutridiab';
-  ASSERT (SELECT has_table_privilege('postgres', 'nutridiab.usuarios', 'SELECT')),
-    'ERROR: postgres no puede hacer SELECT en usuarios';
+  -- Verificar permisos para usuario dnzapata
+  ASSERT (SELECT has_schema_privilege('dnzapata', 'nutridiab', 'USAGE')),
+    'ERROR: dnzapata no tiene permisos sobre schema nutridiab';
+  ASSERT (SELECT has_table_privilege('dnzapata', 'nutridiab.usuarios', 'SELECT')),
+    'ERROR: dnzapata no puede hacer SELECT en usuarios';
+  ASSERT (SELECT has_table_privilege('dnzapata', 'nutridiab.usuarios', 'INSERT')),
+    'ERROR: dnzapata no puede hacer INSERT en usuarios';
+  ASSERT (SELECT has_table_privilege('dnzapata', 'nutridiab.usuarios', 'UPDATE')),
+    'ERROR: dnzapata no puede hacer UPDATE en usuarios';
+  ASSERT (SELECT has_table_privilege('dnzapata', 'nutridiab.usuarios', 'DELETE')),
+    'ERROR: dnzapata no puede hacer DELETE en usuarios';
   
   RAISE NOTICE '✅ Schema nutridiab creado correctamente';
   RAISE NOTICE '✅ Tablas: usuarios, Consultas, mensajes, tokens_acceso';
-  RAISE NOTICE '✅ Funciones: generar_token, validar_token, usar_token, verificar_datos_usuario, puede_usar_servicio, bloquear_usuario, activar_usuario';
+  RAISE NOTICE '✅ Funciones: generar_token, validar_token, usar_token, verificar_datos_usuario, puede_usar_servicio, bloquear_usuario, activar_usuario, limpiar_tokens_expirados';
   RAISE NOTICE '✅ Vista: vista_usuarios_estado';
-  RAISE NOTICE '✅ Permisos configurados para postgres';
+  RAISE NOTICE '✅ Permisos configurados para usuario: dnzapata';
+  RAISE NOTICE '✅ Owner del schema: dnzapata';
   RAISE NOTICE '';
-  RAISE NOTICE '📝 SIGUIENTE PASO: Verifica la conexión desde n8n o tu aplicación';
+  RAISE NOTICE '📝 SIGUIENTE PASO: Configura las credenciales en n8n con:';
+  RAISE NOTICE '   - Usuario: dnzapata';
+  RAISE NOTICE '   - Database: postgres';
+  RAISE NOTICE '   - Schema: nutridiab';
 END $$;
 
 -- ============================================
@@ -482,14 +495,45 @@ SELECT
     schemaname,
     tablename,
     tableowner,
-    has_table_privilege('postgres', schemaname||'.'||tablename, 'SELECT') as puede_select,
-    has_table_privilege('postgres', schemaname||'.'||tablename, 'INSERT') as puede_insert,
-    has_table_privilege('postgres', schemaname||'.'||tablename, 'UPDATE') as puede_update,
-    has_table_privilege('postgres', schemaname||'.'||tablename, 'DELETE') as puede_delete
+    has_table_privilege('dnzapata', schemaname||'.'||tablename, 'SELECT') as puede_select,
+    has_table_privilege('dnzapata', schemaname||'.'||tablename, 'INSERT') as puede_insert,
+    has_table_privilege('dnzapata', schemaname||'.'||tablename, 'UPDATE') as puede_update,
+    has_table_privilege('dnzapata', schemaname||'.'||tablename, 'DELETE') as puede_delete
 FROM pg_tables
 WHERE schemaname = 'nutridiab'
 ORDER BY tablename;
 
 -- Todas las columnas deben mostrar 'true' ✅
+-- El tableowner debe ser 'dnzapata' para todas las tablas ✅
+*/
+
+-- ============================================
+-- VERIFICACIÓN ADICIONAL DE PERMISOS
+-- ============================================
+-- Verifica que el usuario dnzapata tiene todos los permisos necesarios:
+/*
+-- Permisos sobre el schema
+SELECT 
+    'SCHEMA nutridiab' as objeto,
+    has_schema_privilege('dnzapata', 'nutridiab', 'USAGE') as usage,
+    has_schema_privilege('dnzapata', 'nutridiab', 'CREATE') as create;
+
+-- Permisos sobre funciones
+SELECT 
+    routine_name,
+    routine_type,
+    has_function_privilege('dnzapata', routine_schema||'.'||routine_name||'('||
+        COALESCE(array_to_string(ARRAY(
+            SELECT parameter_mode || ' ' || parameter_name || ' ' || data_type
+            FROM information_schema.parameters
+            WHERE specific_name = routines.specific_name
+        ), ', '), '')||')', 'EXECUTE') as puede_ejecutar
+FROM information_schema.routines
+WHERE routine_schema = 'nutridiab';
+
+-- Owner del schema
+SELECT schema_name, schema_owner 
+FROM information_schema.schemata 
+WHERE schema_name = 'nutridiab';
 */
 
