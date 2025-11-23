@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS nutridiab.usuarios (
   "email" VARCHAR(255),
   "telefono" VARCHAR(50),
   "fecha_nacimiento" DATE,
+  "Tipo ID" VARCHAR(50), -- DNI, Pasaporte, etc.
   
   -- Datos médicos
   "tipo_diabetes" VARCHAR(50), -- 'tipo1', 'tipo2', 'gestacional', 'otro'
@@ -34,6 +35,15 @@ CREATE TABLE IF NOT EXISTS nutridiab.usuarios (
   "token_verificacion" VARCHAR(255),
   "token_expira" TIMESTAMP WITH TIME ZONE,
   
+  -- Estado y control
+  "Activo" BOOLEAN DEFAULT TRUE,
+  "Bloqueado" BOOLEAN DEFAULT FALSE,
+  "invitado" BOOLEAN DEFAULT FALSE,
+  "Lenguaje" VARCHAR(10) DEFAULT 'es', -- 'es', 'en', 'pt', etc.
+  
+  -- Pagos y suscripción
+  "ultpago" DATE,
+  
   -- Metadata
   "created_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -44,6 +54,17 @@ CREATE TABLE IF NOT EXISTS nutridiab.usuarios (
 CREATE INDEX IF NOT EXISTS idx_usuarios_remotejid ON nutridiab.usuarios("remoteJid");
 CREATE INDEX IF NOT EXISTS idx_usuarios_email ON nutridiab.usuarios("email");
 CREATE INDEX IF NOT EXISTS idx_usuarios_token ON nutridiab.usuarios("token_verificacion");
+CREATE INDEX IF NOT EXISTS idx_usuarios_activo ON nutridiab.usuarios("Activo");
+CREATE INDEX IF NOT EXISTS idx_usuarios_bloqueado ON nutridiab.usuarios("Bloqueado");
+
+-- Comentarios en tabla
+COMMENT ON TABLE nutridiab.usuarios IS 'Tabla principal de usuarios con verificación y control de acceso';
+COMMENT ON COLUMN nutridiab.usuarios."Activo" IS 'Usuario activo en el sistema (puede ser desactivado temporalmente)';
+COMMENT ON COLUMN nutridiab.usuarios."Bloqueado" IS 'Usuario bloqueado permanentemente (por incumplimiento o pago)';
+COMMENT ON COLUMN nutridiab.usuarios."invitado" IS 'Usuario en modo prueba/invitado con funcionalidad limitada';
+COMMENT ON COLUMN nutridiab.usuarios."Lenguaje" IS 'Idioma preferido del usuario (es, en, pt, etc.)';
+COMMENT ON COLUMN nutridiab.usuarios."ultpago" IS 'Fecha del último pago/suscripción del usuario';
+COMMENT ON COLUMN nutridiab.usuarios."datos_completos" IS 'Indica si el usuario completó todos sus datos personales';
 
 -- ============================================
 -- TABLA: Consultas (sin cambios)
@@ -73,7 +94,7 @@ CREATE TABLE IF NOT EXISTS nutridiab.mensajes (
 
 -- Mensajes existentes + nuevos
 INSERT INTO nutridiab.mensajes ("CODIGO", "Texto") VALUES
-('BIENVENIDA', '¡Hola! 👋 Soy NutriDiab, tu asistente nutricional especializado en diabetes. Estoy aquí para ayudarte a calcular los hidratos de carbono de tus alimentos. 🍽️'),
+('BIENVENIDA', '¡Hola! 👋 Soy Nutridiab, tu asistente nutricional especializado en diabetes. Estoy aquí para ayudarte a calcular los hidratos de carbono de tus alimentos. 🍽️'),
 ('SERVICIO', 'Puedo analizar:
 📝 Texto: Descríbeme tu comida
 📸 Imagen: Envíame una foto de tu plato
@@ -259,6 +280,71 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================
+-- FUNCIÓN: Puede usar el servicio
+-- ============================================
+CREATE OR REPLACE FUNCTION nutridiab.puede_usar_servicio(p_usuario_id INTEGER)
+RETURNS BOOLEAN AS $$
+DECLARE
+  puede BOOLEAN;
+BEGIN
+  SELECT 
+    "Activo" = TRUE AND 
+    "Bloqueado" = FALSE AND
+    "AceptoTerminos" = TRUE AND
+    datos_completos = TRUE
+  INTO puede
+  FROM nutridiab.usuarios
+  WHERE "usuario ID" = p_usuario_id;
+  
+  RETURN COALESCE(puede, FALSE);
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
+-- FUNCIÓN: Bloquear usuario
+-- ============================================
+CREATE OR REPLACE FUNCTION nutridiab.bloquear_usuario(p_usuario_id INTEGER, p_motivo TEXT DEFAULT NULL)
+RETURNS BOOLEAN AS $$
+DECLARE
+  rows_affected INTEGER;
+BEGIN
+  UPDATE nutridiab.usuarios
+  SET 
+    "Bloqueado" = TRUE,
+    "Activo" = FALSE,
+    updated_at = NOW()
+  WHERE "usuario ID" = p_usuario_id;
+  
+  GET DIAGNOSTICS rows_affected = ROW_COUNT;
+  
+  -- Opcional: Registrar motivo en una tabla de logs (por implementar)
+  -- INSERT INTO nutridiab.logs_bloqueos ("usuario ID", motivo, fecha) VALUES (p_usuario_id, p_motivo, NOW());
+  
+  RETURN rows_affected > 0;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
+-- FUNCIÓN: Activar usuario
+-- ============================================
+CREATE OR REPLACE FUNCTION nutridiab.activar_usuario(p_usuario_id INTEGER)
+RETURNS BOOLEAN AS $$
+DECLARE
+  rows_affected INTEGER;
+BEGIN
+  UPDATE nutridiab.usuarios
+  SET 
+    "Activo" = TRUE,
+    "Bloqueado" = FALSE,
+    updated_at = NOW()
+  WHERE "usuario ID" = p_usuario_id;
+  
+  GET DIAGNOSTICS rows_affected = ROW_COUNT;
+  RETURN rows_affected > 0;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
 -- VISTA: Usuarios con estado de verificación
 -- ============================================
 CREATE OR REPLACE VIEW nutridiab.vista_usuarios_estado AS
@@ -271,16 +357,24 @@ SELECT
   u."AceptoTerminos",
   u.datos_completos,
   u.email_verificado,
+  u."Activo",
+  u."Bloqueado",
+  u."invitado",
+  u."Lenguaje",
+  u."ultpago",
   u.created_at,
   u.ultimo_acceso,
   CASE 
+    WHEN u."Bloqueado" THEN 'bloqueado'
+    WHEN NOT u."Activo" THEN 'inactivo'
     WHEN NOT u."AceptoTerminos" THEN 'pendiente_terminos'
     WHEN NOT u.datos_completos THEN 'pendiente_datos'
     WHEN NOT u.email_verificado THEN 'pendiente_email'
     ELSE 'activo'
   END AS estado,
   COUNT(c.id) AS total_consultas,
-  MAX(c.created_at) AS ultima_consulta
+  MAX(c.created_at) AS ultima_consulta,
+  COALESCE(SUM(c."Costo"), 0) AS costo_total
 FROM nutridiab.usuarios u
 LEFT JOIN nutridiab."Consultas" c ON u."usuario ID" = c."usuario ID"
 GROUP BY u."usuario ID";
@@ -292,20 +386,111 @@ GROUP BY u."usuario ID";
 -- VALUES ('5491155555555@s.whatsapp.net', 'Juan', 'Pérez', 'juan@example.com', 'tipo2', TRUE, TRUE, TRUE);
 
 -- ============================================
--- VERIFICACIÓN DE INTEGRIDAD
+-- PERMISOS COMPLETOS PARA POSTGRES Y CONEXIONES EXTERNAS
 -- ============================================
--- Verificar que todas las tablas existen
+-- Estos permisos son CRÍTICOS para que n8n pueda conectarse
+
+-- 1. Permisos sobre el schema
+GRANT USAGE ON SCHEMA nutridiab TO postgres;
+GRANT ALL PRIVILEGES ON SCHEMA nutridiab TO postgres;
+
+-- 2. Permisos sobre todas las tablas
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA nutridiab TO postgres;
+
+-- 3. Permisos sobre secuencias (para IDs autoincrementales)
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA nutridiab TO postgres;
+
+-- 4. Permisos sobre funciones
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA nutridiab TO postgres;
+
+-- 5. Cambiar owner de todas las tablas a postgres (MUY IMPORTANTE)
+ALTER TABLE nutridiab.usuarios OWNER TO postgres;
+ALTER TABLE nutridiab."Consultas" OWNER TO postgres;
+ALTER TABLE nutridiab.mensajes OWNER TO postgres;
+ALTER TABLE nutridiab.tokens_acceso OWNER TO postgres;
+
+-- 6. Cambiar owner de secuencias
+ALTER SEQUENCE nutridiab.usuarios_usuario\ ID_seq OWNER TO postgres;
+ALTER SEQUENCE nutridiab."Consultas_id_seq" OWNER TO postgres;
+ALTER SEQUENCE nutridiab.mensajes_id_seq OWNER TO postgres;
+ALTER SEQUENCE nutridiab.tokens_acceso_id_seq OWNER TO postgres;
+
+-- 7. Permisos por defecto para objetos futuros
+ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON TABLES TO postgres;
+ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON SEQUENCES TO postgres;
+ALTER DEFAULT PRIVILEGES IN SCHEMA nutridiab GRANT ALL ON FUNCTIONS TO postgres;
+
+-- 8. CRÍTICO: Desactivar RLS (Row Level Security) para conexiones externas
+ALTER TABLE nutridiab.usuarios DISABLE ROW LEVEL SECURITY;
+ALTER TABLE nutridiab."Consultas" DISABLE ROW LEVEL SECURITY;
+ALTER TABLE nutridiab.mensajes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE nutridiab.tokens_acceso DISABLE ROW LEVEL SECURITY;
+
+-- 9. Si existe el rol 'anon' o 'authenticated' (Supabase), otorgar permisos básicos
 DO $$
 BEGIN
-  ASSERT (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nutridiab' AND table_name = 'usuarios') = 1,
-    'Tabla usuarios no creada';
-  ASSERT (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nutridiab' AND table_name = 'Consultas') = 1,
-    'Tabla Consultas no creada';
-  ASSERT (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nutridiab' AND table_name = 'tokens_acceso') = 1,
-    'Tabla tokens_acceso no creada';
-  ASSERT (SELECT COUNT(*) FROM nutridiab.mensajes) >= 10,
-    'Mensajes no insertados correctamente';
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    GRANT USAGE ON SCHEMA nutridiab TO anon;
+    GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA nutridiab TO anon;
+    GRANT USAGE ON ALL SEQUENCES IN SCHEMA nutridiab TO anon;
+  END IF;
   
-  RAISE NOTICE 'Schema nutridiab creado correctamente ✅';
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    GRANT USAGE ON SCHEMA nutridiab TO authenticated;
+    GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA nutridiab TO authenticated;
+    GRANT USAGE ON ALL SEQUENCES IN SCHEMA nutridiab TO authenticated;
+  END IF;
 END $$;
+
+-- ============================================
+-- VERIFICACIÓN DE INTEGRIDAD
+-- ============================================
+DO $$
+BEGIN
+  -- Verificar tablas
+  ASSERT (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nutridiab' AND table_name = 'usuarios') = 1,
+    'ERROR: Tabla usuarios no creada';
+  ASSERT (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nutridiab' AND table_name = 'Consultas') = 1,
+    'ERROR: Tabla Consultas no creada';
+  ASSERT (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'nutridiab' AND table_name = 'tokens_acceso') = 1,
+    'ERROR: Tabla tokens_acceso no creada';
+  ASSERT (SELECT COUNT(*) FROM nutridiab.mensajes) >= 10,
+    'ERROR: Mensajes no insertados correctamente';
+  
+  -- Verificar permisos
+  ASSERT (SELECT has_schema_privilege('postgres', 'nutridiab', 'USAGE')),
+    'ERROR: postgres no tiene permisos sobre schema nutridiab';
+  ASSERT (SELECT has_table_privilege('postgres', 'nutridiab.usuarios', 'SELECT')),
+    'ERROR: postgres no puede hacer SELECT en usuarios';
+  
+  RAISE NOTICE '✅ Schema nutridiab creado correctamente';
+  RAISE NOTICE '✅ Tablas: usuarios, Consultas, mensajes, tokens_acceso';
+  RAISE NOTICE '✅ Funciones: generar_token, validar_token, usar_token, verificar_datos_usuario, puede_usar_servicio, bloquear_usuario, activar_usuario';
+  RAISE NOTICE '✅ Vista: vista_usuarios_estado';
+  RAISE NOTICE '✅ Permisos configurados para postgres';
+  RAISE NOTICE '✅ RLS desactivado';
+  RAISE NOTICE '';
+  RAISE NOTICE '🔐 IMPORTANTE: Resetea el password de la base de datos en Supabase Dashboard';
+  RAISE NOTICE '📝 Settings → Database → Reset database password';
+END $$;
+
+-- ============================================
+-- VERIFICACIÓN DE PERMISOS (Para debugging)
+-- ============================================
+-- Ejecuta esto para verificar permisos en todas las tablas:
+/*
+SELECT 
+    schemaname,
+    tablename,
+    tableowner,
+    has_table_privilege('postgres', schemaname||'.'||tablename, 'SELECT') as puede_select,
+    has_table_privilege('postgres', schemaname||'.'||tablename, 'INSERT') as puede_insert,
+    has_table_privilege('postgres', schemaname||'.'||tablename, 'UPDATE') as puede_update,
+    has_table_privilege('postgres', schemaname||'.'||tablename, 'DELETE') as puede_delete
+FROM pg_tables
+WHERE schemaname = 'nutridiab'
+ORDER BY tablename;
+
+-- Todas las columnas deben mostrar 'true' ✅
+*/
 
