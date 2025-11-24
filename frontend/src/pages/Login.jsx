@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { nutridiabApi } from '../services/nutridiabApi';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 function Login() {
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading, login: authLogin } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -12,30 +13,12 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Verificar si ya hay sesión activa
+  // Redirigir si ya está autenticado
   useEffect(() => {
-    const token = localStorage.getItem('nutridiab_token');
-    if (token) {
-      // Validar token y redirigir si es válido
-      validateAndRedirect(token);
+    if (!authLoading && isAuthenticated) {
+      navigate('/dashboard', { replace: true });
     }
-  }, []);
-
-  const validateAndRedirect = async (token) => {
-    try {
-      const response = await nutridiabApi.validateSession(token);
-      if (response.valida) {
-        navigate('/dashboard');
-      } else {
-        localStorage.removeItem('nutridiab_token');
-        localStorage.removeItem('nutridiab_user');
-      }
-    } catch (err) {
-      console.error('Error validando sesión:', err);
-      localStorage.removeItem('nutridiab_token');
-      localStorage.removeItem('nutridiab_user');
-    }
-  };
+  }, [isAuthenticated, authLoading, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,25 +35,12 @@ function Login() {
     setError(null);
 
     try {
-      const response = await nutridiabApi.login(
-        formData.username,
-        formData.password
-      );
+      const response = await authLogin(formData.username, formData.password);
 
       if (response.success) {
-        // Guardar token y datos del usuario en localStorage
-        localStorage.setItem('nutridiab_token', response.token);
-        localStorage.setItem('nutridiab_user', JSON.stringify({
-          user_id: response.user_id,
-          username: response.username,
-          nombre: response.nombre,
-          apellido: response.apellido,
-          email: response.email,
-          rol: response.rol
-        }));
-
-        // Redirigir al dashboard
-        navigate('/dashboard');
+        // El AuthContext ya maneja el estado y localStorage
+        // La redirección se hace automáticamente por el useEffect
+        navigate('/dashboard', { replace: true });
       } else {
         setError(response.message || 'Usuario o contraseña incorrectos');
       }
@@ -81,6 +51,24 @@ function Login() {
       setLoading(false);
     }
   };
+
+  // Mostrar loading mientras se verifica la sesión inicial
+  if (authLoading) {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-header">
+            <div className="logo">🩺</div>
+            <h1>NutriDiab</h1>
+            <p className="subtitle">Verificando sesión...</p>
+          </div>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <span className="spinner-small"></span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="login-container">
