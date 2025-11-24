@@ -1,0 +1,91 @@
+{
+  "name": "NutriDiab - Auth - Logout",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutridiab/auth/logout",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-logout",
+      "name": "Webhook Logout",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "nutridiab-logout"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT nutridiab.logout_usuario('{{ $json.body.token }}') AS success",
+        "additionalFields": {}
+      },
+      "id": "postgres-logout",
+      "name": "PostgreSQL - Logout",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": {{ $json.success }},\n  \"message\": \"Sesión cerrada exitosamente\"\n}",
+        "options": {}
+      },
+      "id": "response-logout",
+      "name": "Response Logout",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Logout": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL - Logout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL - Logout": {
+      "main": [
+        [
+          {
+            "node": "Response Logout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "nutridiab",
+      "id": "1"
+    },
+    {
+      "name": "auth",
+      "id": "2"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

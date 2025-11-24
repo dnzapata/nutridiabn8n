@@ -1,0 +1,139 @@
+{
+  "name": "NutriDiab - Auth - Validate Session",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutridiab/auth/validate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-validate",
+      "name": "Webhook Validate",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "nutridiab-validate"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM nutridiab.validar_sesion('{{ $json.body.token }}') AS result",
+        "additionalFields": {}
+      },
+      "id": "postgres-validate",
+      "name": "PostgreSQL - Validate",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.valida }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-session-valid",
+      "name": "Sesión Válida?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"valida\": true,\n  \"usuario_id\": {{ $json.usuario_id }},\n  \"username\": \"{{ $json.username }}\",\n  \"nombre\": \"{{ $json.nombre }}\",\n  \"apellido\": \"{{ $json.apellido }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"rol\": \"{{ $json.rol }}\"\n}",
+        "options": {}
+      },
+      "id": "response-valid",
+      "name": "Response Valid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 401,
+        "responseBody": "={\n  \"valida\": false,\n  \"expiro\": {{ $json.expiro || false }},\n  \"message\": \"Sesión inválida o expirada\"\n}",
+        "options": {}
+      },
+      "id": "response-invalid",
+      "name": "Response Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 400]
+    }
+  ],
+  "connections": {
+    "Webhook Validate": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL - Validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL - Validate": {
+      "main": [
+        [
+          {
+            "node": "Sesión Válida?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sesión Válida?": {
+      "main": [
+        [
+          {
+            "node": "Response Valid",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "nutridiab",
+      "id": "1"
+    },
+    {
+      "name": "auth",
+      "id": "2"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

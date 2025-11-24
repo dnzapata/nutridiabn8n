@@ -17,7 +17,16 @@ function Dashboard() {
       setLoading(true);
       
       // Obtener estadísticas reales desde n8n
-      const statsData = await nutridiabApi.getStats();
+      const statsResponse = await nutridiabApi.getStats();
+      
+      // Manejar diferentes formatos de respuesta de n8n
+      // PostgreSQL en n8n devuelve un array, tomamos el primer elemento
+      let statsData = {};
+      if (Array.isArray(statsResponse) && statsResponse.length > 0) {
+        statsData = statsResponse[0];
+      } else if (statsResponse && typeof statsResponse === 'object') {
+        statsData = statsResponse.data || statsResponse.stats || statsResponse;
+      }
       
       // Transformar datos de Supabase al formato del componente
       const transformedStats = {
@@ -37,7 +46,17 @@ function Dashboard() {
       };
 
       // Obtener actividad reciente
-      const consultasRecientes = await nutridiabApi.getRecentQueries(10);
+      const consultasResponse = await nutridiabApi.getRecentQueries(10);
+      
+      // Manejar diferentes formatos de respuesta de n8n
+      // n8n puede devolver un array directamente o un objeto con los datos
+      let consultasRecientes = [];
+      if (Array.isArray(consultasResponse)) {
+        consultasRecientes = consultasResponse;
+      } else if (consultasResponse && typeof consultasResponse === 'object') {
+        // Si es un objeto, intentar extraer el array
+        consultasRecientes = consultasResponse.data || consultasResponse.results || consultasResponse.consultas || [];
+      }
       
       const transformedActivity = consultasRecientes.map(consulta => ({
         id: consulta.id,

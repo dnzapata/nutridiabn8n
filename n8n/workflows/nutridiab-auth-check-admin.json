@@ -1,0 +1,91 @@
+{
+  "name": "NutriDiab - Auth - Check Admin",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutridiab/auth/check-admin",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-check-admin",
+      "name": "Webhook Check Admin",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "nutridiab-check-admin"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT nutridiab.es_administrador('{{ $json.body.token }}') AS es_admin",
+        "additionalFields": {}
+      },
+      "id": "postgres-check-admin",
+      "name": "PostgreSQL - Check Admin",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"es_admin\": {{ $json.es_admin }}\n}",
+        "options": {}
+      },
+      "id": "response-check-admin",
+      "name": "Response Check Admin",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Check Admin": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL - Check Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL - Check Admin": {
+      "main": [
+        [
+          {
+            "node": "Response Check Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "nutridiab",
+      "id": "1"
+    },
+    {
+      "name": "auth",
+      "id": "2"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

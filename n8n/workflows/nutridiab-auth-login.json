@@ -1,0 +1,170 @@
+{
+  "name": "NutriDiab - Auth - Login",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutridiab/auth/login",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-login",
+      "name": "Webhook Login",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "nutridiab-login"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM nutridiab.login_usuario(\n  '{{ $json.body.username }}',\n  crypt('{{ $json.body.password }}', password_hash),\n  '{{ $json.headers[\"x-forwarded-for\"] || $json.headers[\"x-real-ip\"] || \"unknown\" }}',\n  '{{ $json.headers[\"user-agent\"] || \"unknown\" }}'\n) AS result",
+        "additionalFields": {}
+      },
+      "id": "postgres-login",
+      "name": "PostgreSQL - Login",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Supabase PostgreSQL"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.success }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-login-success",
+      "name": "Login Exitoso?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"user_id\": {{ $json.user_id }},\n  \"username\": \"{{ $json.username }}\",\n  \"nombre\": \"{{ $json.nombre }}\",\n  \"apellido\": \"{{ $json.apellido }}\",\n  \"email\": \"{{ $json.email }}\",\n  \"rol\": \"{{ $json.rol }}\",\n  \"token\": \"{{ $json.token }}\",\n  \"message\": \"Login exitoso\"\n}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "response-success",
+      "name": "Response Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 401,
+        "responseBody": "={\n  \"success\": false,\n  \"message\": \"{{ $json.message || 'Usuario o contraseña incorrectos' }}\"\n}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "response-error",
+      "name": "Response Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 500,
+        "responseBody": "={\n  \"success\": false,\n  \"message\": \"Error en el servidor\"\n}",
+        "options": {}
+      },
+      "id": "response-server-error",
+      "name": "Response Server Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [450, 500]
+    }
+  ],
+  "connections": {
+    "Webhook Login": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL - Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL - Login": {
+      "main": [
+        [
+          {
+            "node": "Login Exitoso?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Login Exitoso?": {
+      "main": [
+        [
+          {
+            "node": "Response Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "nutridiab",
+      "id": "1"
+    },
+    {
+      "name": "auth",
+      "id": "2"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

@@ -11,7 +11,7 @@ export const nutridiabApi = {
    */
   getDashboardStats: async () => {
     try {
-      const response = await api.get('/webhook/nutridiab/stats');
+      const response = await api.get('/webhook/nutridiab/admin/stats');
       return response.data;
     } catch (error) {
       throw error;
@@ -24,7 +24,7 @@ export const nutridiabApi = {
   getUsers: async (params = {}) => {
     try {
       const { page = 1, limit = 10, search = '' } = params;
-      const response = await api.get('/webhook/nutridiab/users', {
+      const response = await api.get('/webhook/nutridiab/admin/usuarios', {
         params: { page, limit, search }
       });
       return response.data;
@@ -38,7 +38,7 @@ export const nutridiabApi = {
    */
   getUser: async (userId) => {
     try {
-      const response = await api.get(`/webhook/nutridiab/users/${userId}`);
+      const response = await api.get(`/webhook/nutridiab/admin/usuarios/${userId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -51,7 +51,7 @@ export const nutridiabApi = {
   getConsultas: async (params = {}) => {
     try {
       const { page = 1, limit = 10, tipo = '', userId = '' } = params;
-      const response = await api.get('/webhook/nutridiab/consultas', {
+      const response = await api.get('/webhook/nutridiab/admin/consultas', {
         params: { page, limit, tipo, userId }
       });
       return response.data;
@@ -66,7 +66,7 @@ export const nutridiabApi = {
   getUserConsultas: async (userId, params = {}) => {
     try {
       const { page = 1, limit = 10 } = params;
-      const response = await api.get(`/webhook/nutridiab/users/${userId}/consultas`, {
+      const response = await api.get(`/webhook/nutridiab/admin/usuarios/${userId}/consultas`, {
         params: { page, limit }
       });
       return response.data;
@@ -81,7 +81,7 @@ export const nutridiabApi = {
   getCostStats: async (params = {}) => {
     try {
       const { startDate = '', endDate = '' } = params;
-      const response = await api.get('/webhook/nutridiab/costs', {
+      const response = await api.get('/webhook/nutridiab/admin/costs', {
         params: { startDate, endDate }
       });
       return response.data;
@@ -95,7 +95,7 @@ export const nutridiabApi = {
    */
   getTypeStats: async () => {
     try {
-      const response = await api.get('/webhook/nutridiab/stats/types');
+      const response = await api.get('/webhook/nutridiab/admin/stats/types');
       return response.data;
     } catch (error) {
       throw error;
@@ -103,11 +103,11 @@ export const nutridiabApi = {
   },
 
   /**
-   * Obtener actividad reciente
+   * Obtener actividad reciente (consultas recientes)
    */
   getRecentActivity: async (limit = 10) => {
     try {
-      const response = await api.get('/webhook/nutridiab/activity', {
+      const response = await api.get('/webhook/nutridiab/admin/consultas', {
         params: { limit }
       });
       return response.data;
@@ -121,7 +121,7 @@ export const nutridiabApi = {
    */
   searchUsers: async (query) => {
     try {
-      const response = await api.get('/webhook/nutridiab/users/search', {
+      const response = await api.get('/webhook/nutridiab/admin/usuarios/search', {
         params: { q: query }
       });
       return response.data;
@@ -135,7 +135,7 @@ export const nutridiabApi = {
    */
   exportConsultas: async (params = {}) => {
     try {
-      const response = await api.get('/webhook/nutridiab/export/consultas', {
+      const response = await api.get('/webhook/nutridiab/admin/export/consultas', {
         params,
         responseType: 'blob'
       });
@@ -150,8 +150,78 @@ export const nutridiabApi = {
    */
   getUsageChart: async (period = '7days') => {
     try {
-      const response = await api.get('/webhook/nutridiab/charts/usage', {
+      const response = await api.get('/webhook/nutridiab/admin/charts/usage', {
         params: { period }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Aliases para compatibilidad
+  getStats: async () => {
+    return nutridiabApi.getDashboardStats();
+  },
+
+  getRecentQueries: async (limit = 10) => {
+    return nutridiabApi.getRecentActivity(limit);
+  },
+
+  /**
+   * AUTENTICACIÓN
+   */
+
+  /**
+   * Login de usuario
+   */
+  login: async (username, password) => {
+    try {
+      const response = await api.post('/webhook/nutridiab/auth/login', {
+        username,
+        password
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Validar sesión actual
+   */
+  validateSession: async (token) => {
+    try {
+      const response = await api.post('/webhook/nutridiab/auth/validate', {
+        token
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Logout de usuario
+   */
+  logout: async (token) => {
+    try {
+      const response = await api.post('/webhook/nutridiab/auth/logout', {
+        token
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Verificar si usuario es administrador
+   */
+  checkAdmin: async (token) => {
+    try {
+      const response = await api.post('/webhook/nutridiab/auth/check-admin', {
+        token
       });
       return response.data;
     } catch (error) {

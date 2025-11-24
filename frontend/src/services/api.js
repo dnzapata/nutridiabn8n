@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 // Configuración base de axios
-const API_URL = import.meta.env.VITE_API_URL || 'https://wf.zynaptic.tech';
+// En desarrollo usamos ruta relativa para aprovechar el proxy de Vite
+// En producción usamos la URL completa
+const isDevelopment = import.meta.env.DEV;
+const API_URL = isDevelopment 
+  ? '' // Usar proxy de Vite en desarrollo
+  : (import.meta.env.VITE_API_URL || 'https://wf.zynaptic.tech');
 
 const api = axios.create({
   baseURL: API_URL,
