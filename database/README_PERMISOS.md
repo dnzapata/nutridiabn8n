@@ -267,3 +267,4 @@ WHERE schemaname = 'nutridiab';
 **Versión del schema**: 1.0  
 **Usuario configurado**: dnzapata
 
+

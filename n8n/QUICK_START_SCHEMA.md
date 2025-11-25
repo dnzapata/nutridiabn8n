@@ -104,3 +104,4 @@ ALTER ROLE dnzapata SET search_path TO nutridiab, public;
 
 ✨ **Listo! Ahora puedes usar queries más limpios en n8n.**
 
+

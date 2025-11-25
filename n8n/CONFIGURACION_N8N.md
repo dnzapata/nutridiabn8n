@@ -382,3 +382,4 @@ WHERE schemaname = 'nutridiab';
 **Workflows activos**: 6  
 **Base de datos**: Supabase (PostgreSQL)
 
+

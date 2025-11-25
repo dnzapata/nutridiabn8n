@@ -230,3 +230,4 @@ psql -U dnzapata -d nutridiab -c "SELECT * FROM nutridiab.login_usuario('dnzapat
 
 Después de seguir estos pasos, tu login funcionará independientemente del estado de pgcrypto, con logs detallados para debugging.
 
+

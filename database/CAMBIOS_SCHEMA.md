@@ -371,3 +371,4 @@ ORDER BY created_at DESC;
 **Proyecto**: Nutridiab - Control Nutricional para Diabéticos  
 **Fecha**: 2025-11-23
 
+

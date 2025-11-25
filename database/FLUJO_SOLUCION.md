@@ -266,3 +266,4 @@ psql -U dnzapata -d nutridiab -f database\login_simple_directo.sql
 
 ✨ **Listo en 30 segundos**
 
+

@@ -209,3 +209,4 @@ psql -U dnzapata -d nutridiab -c "SELECT * FROM nutridiab.login_usuario('dnzapat
 
 ✨ **Listo. Ahora puedes continuar con n8n y el frontend.**
 
+

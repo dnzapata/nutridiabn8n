@@ -86,3 +86,4 @@ END $$;
 -- PASO 4: Mostrar versión de PostgreSQL
 SELECT version() AS postgres_version;
 
+

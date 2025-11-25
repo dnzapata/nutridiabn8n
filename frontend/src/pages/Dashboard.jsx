@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { nutridiabApi } from '../services/nutridiabApi';
 import './Dashboard.css';
 
@@ -268,18 +269,18 @@ function Dashboard() {
       <div className="quick-actions">
         <h2>Acciones Rápidas</h2>
         <div className="actions-grid">
-          <a href="/users" className="action-button">
+          <Link to="/users" className="action-button">
             <span className="action-icon">👥</span>
             <span className="action-text">Ver Usuarios</span>
-          </a>
-          <a href="/consultas" className="action-button">
+          </Link>
+          <Link to="/consultas" className="action-button">
             <span className="action-icon">💬</span>
             <span className="action-text">Ver Consultas</span>
-          </a>
-          <a href="/costos" className="action-button">
+          </Link>
+          <Link to="/costos" className="action-button">
             <span className="action-icon">💰</span>
             <span className="action-text">Análisis de Costos</span>
-          </a>
+          </Link>
           <a href="https://wf.zynaptic.tech" target="_blank" rel="noopener noreferrer" className="action-button">
             <span className="action-icon">⚙️</span>
             <span className="action-text">Configurar n8n</span>

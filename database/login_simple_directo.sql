@@ -167,3 +167,4 @@ SELECT
   rol
 FROM nutridiab.login_usuario('dnzapata', 'Fl100190', '127.0.0.1', 'test-script');
 
+

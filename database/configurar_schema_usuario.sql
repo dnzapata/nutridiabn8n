@@ -195,3 +195,4 @@ SELECT
 FROM pg_roles
 WHERE rolname = 'dnzapata';
 
+
