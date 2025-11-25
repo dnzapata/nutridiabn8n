@@ -163,7 +163,7 @@ function Users() {
               <th>Nombre</th>
               <th>Apellido</th>
               <th>Email</th>
-              <th>Teléfono</th>
+              <th>RemoteJid</th>
               <th>Estado</th>
               <th>Verificado</th>
               <th>Rol</th>
@@ -188,7 +188,7 @@ function Users() {
                   <td className="user-name">{user.nombre || 'N/A'}</td>
                   <td className="user-lastname">{user.apellido || 'N/A'}</td>
                   <td className="user-email">{user.email || 'N/A'}</td>
-                  <td className="user-phone">{user.remotejid || user.telefono || 'N/A'}</td>
+                  <td className="user-remotejid">{user.remoteJid || 'N/A'}</td>
                   <td>
                     <span className={`status-badge ${user.status === 'active' ? 'active' : 'inactive'}`}>
                       {user.status === 'active' ? '✓ Activo' : '✗ Inactivo'}
@@ -276,8 +276,8 @@ function Users() {
                     <span className="detail-value">{selectedUser.email || 'N/A'}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Teléfono:</span>
-                    <span className="detail-value">{selectedUser.remotejid || selectedUser.telefono || 'N/A'}</span>
+                    <span className="detail-label">RemoteJid (WhatsApp):</span>
+                    <span className="detail-value">{selectedUser.remoteJid || 'N/A'}</span>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Edad:</span>

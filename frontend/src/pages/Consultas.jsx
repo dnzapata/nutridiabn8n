@@ -220,6 +220,7 @@ function Consultas() {
               <th>ID</th>
               <th>Usuario</th>
               <th>Email</th>
+              <th>RemoteJid</th>
               <th>Tipo</th>
               <th>Resultado</th>
               <th>Costo</th>
@@ -230,7 +231,7 @@ function Consultas() {
           <tbody>
             {consultas.length === 0 ? (
               <tr>
-                <td colSpan="8" className="no-data">
+                <td colSpan="9" className="no-data">
                   {searchTerm || tipoFilter !== 'todos'
                     ? '🔍 No se encontraron consultas con ese criterio de búsqueda'
                     : '📭 No hay consultas registradas'
@@ -251,6 +252,7 @@ function Consultas() {
                       : 'N/A'}
                   </td>
                   <td className="consulta-email">{consulta.email || 'N/A'}</td>
+                  <td className="consulta-remotejid">{consulta.remoteJid || 'N/A'}</td>
                   <td>
                     <span className={`tipo-badge ${getTipoBadgeClass(consulta.tipo)}`}>
                       {getTipoIcon(consulta.tipo)} {consulta.tipo}
@@ -358,6 +360,10 @@ function Consultas() {
                   <div className="detail-item">
                     <span className="detail-label">Email:</span>
                     <span className="detail-value">{selectedConsulta.email || 'N/A'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">RemoteJid (WhatsApp):</span>
+                    <span className="detail-value">{selectedConsulta.remoteJid || 'N/A'}</span>
                   </div>
                 </div>
               </div>
