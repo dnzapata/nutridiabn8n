@@ -34,7 +34,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Transformar datos de Postgres al formato esperado por el frontend\nconst usuarios = [];\n\nfor (const item of $input.all()) {\n  const user = {\n    id: item.json['usuario ID'],\n    nombre: item.json.nombre || '',\n    apellido: item.json.apellido || '',\n    email: item.json.email || '',\n    remotejid: item.json.remoteJid || '',\n    telefono: item.json.remoteJid || '',\n    edad: item.json.edad || null,\n    peso: item.json.peso || null,\n    altura: item.json.altura || null,\n    objetivos: item.json.objetivos || '',\n    restricciones: item.json.restricciones || '',\n    status: item.json.Activo ? 'active' : 'inactive',\n    verified: item.json.email_verificado || false,\n    role: item.json.rol === 'administrador' ? 'admin' : 'user',\n    acepto_terminos: item.json.AceptoTerminos || false,\n    datos_completos: item.json.datos_completos || false,\n    bloqueado: item.json.Bloqueado || false,\n    tipo_diabetes: item.json.tipo_diabetes || '',\n    created_at: item.json.created_at,\n    updated_at: item.json.updated_at,\n    ultimo_acceso: item.json.ultimo_acceso,\n    total_consultas: parseInt(item.json.total_consultas) || 0,\n    costo_total: parseFloat(item.json.costo_total) || 0,\n    ultima_consulta: item.json.ultima_consulta\n  };\n  \n  usuarios.push(user);\n}\n\nreturn usuarios.map(user => ({ json: user }));"
+        "jsCode": "// Transformar datos de Postgres al formato esperado por el frontend\nconst usuarios = [];\n\nfor (const item of $input.all()) {\n  const user = {\n    id: item.json['usuario ID'],\n    nombre: item.json.nombre || '',\n    apellido: item.json.apellido || '',\n    email: item.json.email || '',\n    remotejid: item.json.remoteJid || '',\n    telefono: item.json.remoteJid || '',\n    edad: item.json.edad || null,\n    peso: item.json.peso || null,\n    altura: item.json.altura || null,\n    objetivos: item.json.objetivos || '',\n    restricciones: item.json.restricciones || '',\n    status: item.json.Activo ? 'active' : 'inactive',\n    verified: item.json.email_verificado || false,\n    role: item.json.rol === 'administrador' ? 'admin' : 'user',\n    acepto_terminos: item.json.AceptoTerminos || false,\n    datos_completos: item.json.datos_completos || false,\n    bloqueado: item.json.Bloqueado || false,\n    tipo_diabetes: item.json.tipo_diabetes || '',\n    created_at: item.json.created_at,\n    updated_at: item.json.updated_at,\n    ultimo_acceso: item.json.ultimo_acceso,\n    total_consultas: parseInt(item.json.total_consultas) || 0,\n    costo_total: parseFloat(item.json.costo_total) || 0,\n    ultima_consulta: item.json.ultima_consulta\n  };\n  \n  usuarios.push(user);\n}\n\n// Retornar un solo objeto con el array de usuarios\n// Esto permite que el nodo Responder devuelva el array completo\nreturn [{ json: usuarios }];"
       },
       "id": "transform-data",
       "name": "Transformar Datos",
@@ -44,8 +44,7 @@
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ $json }}"
+        "respondWith": "allIncomingItems"
       },
       "id": "respond",
       "name": "Responder",

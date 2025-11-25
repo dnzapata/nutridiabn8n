@@ -43,8 +43,9 @@ function UsersDebug() {
         total = response.length;
       } else if (response && typeof response === 'object') {
         console.log('📋 Response is object, keys:', Object.keys(response));
-        usersData = response.data || response.users || response.usuarios || [];
-        total = response.total || response.totalUsers || usersData.length;
+        // Soportar múltiples formatos: data, users, usuarios, value
+        usersData = response.data || response.users || response.usuarios || response.value || [];
+        total = response.total || response.totalUsers || response.Count || usersData.length;
         console.log('📋 Extracted users:', usersData.length);
       }
 

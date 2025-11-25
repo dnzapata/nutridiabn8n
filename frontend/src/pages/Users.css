@@ -161,12 +161,33 @@
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
   margin-bottom: 2rem;
+}
+
+/* Estilo personalizado para la barra de desplazamiento */
+.users-table-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.users-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0 0 16px 16px;
+}
+
+.users-table-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 6px;
+}
+
+.users-table-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
 }
 
 .users-table {
   width: 100%;
+  min-width: 1200px;
   border-collapse: collapse;
 }
 
@@ -504,12 +525,8 @@
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .users-table-container {
-    overflow-x: auto;
-  }
-
   .users-table {
-    min-width: 1000px;
+    min-width: 1100px;
   }
 }
 
