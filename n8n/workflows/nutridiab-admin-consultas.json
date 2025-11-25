@@ -17,7 +17,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "-- Consultas recientes con datos de usuario\nSELECT \n  c.id,\n  c.tipo,\n  c.resultado,\n  c.\"Costo\",\n  c.created_at,\n  u.nombre,\n  u.apellido,\n  u.email\nFROM nutridiab.\"Consultas\" c\nJOIN nutridiab.usuarios u ON c.\"usuario ID\" = u.\"usuario ID\"\nORDER BY c.created_at DESC\nLIMIT {{ $json.query.limit || 50 }};",
+        "query": "=-- Consultas recientes con datos de usuario\nSELECT \n  c.id,\n  c.tipo,\n  c.resultado,\n  c.\"Costo\",\n  c.created_at,\n  u.nombre,\n  u.apellido,\n  u.email\nFROM nutridiab.\"Consultas\" c\nJOIN nutridiab.usuarios u ON c.\"usuario ID\" = u.\"usuario ID\"\nORDER BY c.created_at DESC\nLIMIT {{ $json.query.limit || 50 }};",
         "options": {}
       },
       "id": "postgres-consultas",
@@ -34,14 +34,24 @@
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ $json }}"
+        "jsCode": "// Transformar datos para devolver array completo\nconst consultas = [];\n\nfor (const item of $input.all()) {\n  consultas.push(item.json);\n}\n\n// CORREGIDO: Retornar array de items (NO un solo item con array dentro)\n// Cada consulta debe ser un item separado con su propiedad json\nreturn consultas.map(consulta => ({ json: consulta }));"
+      },
+      "id": "transformar-datos",
+      "name": "Transformar Datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
       },
       "id": "respond",
       "name": "Responder",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [650, 300]
+      "position": [850, 300]
     }
   ],
   "connections": {
@@ -57,6 +67,17 @@
       ]
     },
     "Postgres Consultas": {
+      "main": [
+        [
+          {
+            "node": "Transformar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transformar Datos": {
       "main": [
         [
           {

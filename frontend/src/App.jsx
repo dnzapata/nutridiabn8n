@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import About from './pages/About'
 import Users from './pages/Users'
 import UsersDebug from './pages/Users-debug'
+import Consultas from './pages/Consultas'
 import UserRegistration from './pages/UserRegistration'
 import RegistrationSuccess from './pages/RegistrationSuccess'
 import './App.css'
@@ -53,6 +54,18 @@ function App() {
               <ProtectedRoute requireAdmin={true}>
                 <Layout>
                   <UsersDebug />
+                </Layout>
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Consultas - Solo administradores */}
+          <Route 
+            path="/consultas" 
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <Layout>
+                  <Consultas />
                 </Layout>
               </ProtectedRoute>
             } 
