@@ -11,6 +11,9 @@ function Users() {
   const [totalUsers, setTotalUsers] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserDetail, setShowUserDetail] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState(null);
+  const [saving, setSaving] = useState(false);
   const usersPerPage = 15;
 
   useEffect(() => {
@@ -68,6 +71,69 @@ function Users() {
   const closeUserDetail = () => {
     setShowUserDetail(false);
     setSelectedUser(null);
+    setIsEditing(false);
+    setEditedUser(null);
+  };
+
+  const handleEditClick = () => {
+    setEditedUser({ ...selectedUser });
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditedUser(null);
+    setIsEditing(false);
+  };
+
+  const handleFieldChange = (field, value) => {
+    setEditedUser(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveChanges = async () => {
+    try {
+      setSaving(true);
+      
+      // Preparar datos para enviar (solo campos editables)
+      const updateData = {
+        nombre: editedUser.nombre,
+        apellido: editedUser.apellido,
+        email: editedUser.email,
+        edad: editedUser.edad ? parseInt(editedUser.edad) : null,
+        peso: editedUser.peso ? parseFloat(editedUser.peso) : null,
+        altura: editedUser.altura ? parseFloat(editedUser.altura) : null,
+        objetivos: editedUser.objetivos || '',
+        restricciones: editedUser.restricciones || '',
+        tipo_diabetes: editedUser.tipo_diabetes || '',
+        verified: editedUser.verified,
+        status: editedUser.status,
+        role: editedUser.role
+      };
+
+      // Agregar nueva contraseña solo si se proporcionó
+      if (editedUser.newPassword && editedUser.newPassword.trim() !== '') {
+        updateData.newPassword = editedUser.newPassword;
+      }
+
+      await nutridiabApi.updateUser(selectedUser.id, updateData);
+      
+      // Actualizar el usuario seleccionado con los nuevos datos
+      setSelectedUser(editedUser);
+      setIsEditing(false);
+      setEditedUser(null);
+      
+      // Recargar la lista de usuarios
+      fetchUsers();
+      
+      alert('✅ Usuario actualizado correctamente');
+    } catch (err) {
+      console.error('Error al actualizar usuario:', err);
+      alert('❌ Error al actualizar el usuario. Por favor, intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -266,30 +332,109 @@ function Users() {
                     <span className="detail-value">{selectedUser.id}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Nombre Completo:</span>
-                    <span className="detail-value">
-                      {selectedUser.nombre} {selectedUser.apellido}
-                    </span>
+                    <span className="detail-label">Nombre:</span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        className="detail-input"
+                        value={editedUser.nombre || ''}
+                        onChange={(e) => handleFieldChange('nombre', e.target.value)}
+                      />
+                    ) : (
+                      <span className="detail-value">{selectedUser.nombre || 'N/A'}</span>
+                    )}
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Apellido:</span>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        className="detail-input"
+                        value={editedUser.apellido || ''}
+                        onChange={(e) => handleFieldChange('apellido', e.target.value)}
+                      />
+                    ) : (
+                      <span className="detail-value">{selectedUser.apellido || 'N/A'}</span>
+                    )}
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Email:</span>
-                    <span className="detail-value">{selectedUser.email || 'N/A'}</span>
+                    {isEditing ? (
+                      <input
+                        type="email"
+                        className="detail-input"
+                        value={editedUser.email || ''}
+                        onChange={(e) => handleFieldChange('email', e.target.value)}
+                      />
+                    ) : (
+                      <span className="detail-value">{selectedUser.email || 'N/A'}</span>
+                    )}
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">RemoteJid (WhatsApp):</span>
-                    <span className="detail-value">{selectedUser.remoteJid || 'N/A'}</span>
+                    <span className="detail-value" style={{color: '#666', fontStyle: 'italic'}}>
+                      {selectedUser.remoteJid || selectedUser.remotejid || 'N/A'}
+                    </span>
                   </div>
+                  {isEditing && (
+                    <div className="detail-item" style={{gridColumn: '1 / -1'}}>
+                      <span className="detail-label">Nueva Contraseña:</span>
+                      <input
+                        type="password"
+                        className="detail-input"
+                        value={editedUser.newPassword || ''}
+                        onChange={(e) => handleFieldChange('newPassword', e.target.value)}
+                        placeholder="Dejar vacío para no cambiar"
+                      />
+                      <small style={{display: 'block', marginTop: '0.25rem', color: '#666', fontSize: '0.85rem'}}>
+                        💡 Dejar vacío si no deseas cambiar la contraseña
+                      </small>
+                    </div>
+                  )}
                   <div className="detail-item">
                     <span className="detail-label">Edad:</span>
-                    <span className="detail-value">{selectedUser.edad || 'N/A'}</span>
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        className="detail-input"
+                        value={editedUser.edad || ''}
+                        onChange={(e) => handleFieldChange('edad', e.target.value)}
+                        min="0"
+                        max="150"
+                      />
+                    ) : (
+                      <span className="detail-value">{selectedUser.edad || 'N/A'}</span>
+                    )}
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Peso:</span>
-                    <span className="detail-value">{selectedUser.peso ? `${selectedUser.peso} kg` : 'N/A'}</span>
+                    <span className="detail-label">Peso (kg):</span>
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        className="detail-input"
+                        value={editedUser.peso || ''}
+                        onChange={(e) => handleFieldChange('peso', e.target.value)}
+                        min="0"
+                        step="0.1"
+                      />
+                    ) : (
+                      <span className="detail-value">{selectedUser.peso ? `${selectedUser.peso} kg` : 'N/A'}</span>
+                    )}
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Altura:</span>
-                    <span className="detail-value">{selectedUser.altura ? `${selectedUser.altura} cm` : 'N/A'}</span>
+                    <span className="detail-label">Altura (cm):</span>
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        className="detail-input"
+                        value={editedUser.altura || ''}
+                        onChange={(e) => handleFieldChange('altura', e.target.value)}
+                        min="0"
+                        step="0.1"
+                      />
+                    ) : (
+                      <span className="detail-value">{selectedUser.altura ? `${selectedUser.altura} cm` : 'N/A'}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -299,21 +444,72 @@ function Users() {
                 <div className="detail-grid">
                   <div className="detail-item">
                     <span className="detail-label">Estado:</span>
-                    <span className={`status-badge ${selectedUser.status === 'active' ? 'active' : 'inactive'}`}>
-                      {selectedUser.status === 'active' ? '✓ Activo' : '✗ Inactivo'}
-                    </span>
+                    {isEditing ? (
+                      <select
+                        className="detail-input"
+                        value={editedUser.status || 'active'}
+                        onChange={(e) => handleFieldChange('status', e.target.value)}
+                      >
+                        <option value="active">✓ Activo</option>
+                        <option value="inactive">✗ Inactivo</option>
+                      </select>
+                    ) : (
+                      <span className={`status-badge ${selectedUser.status === 'active' ? 'active' : 'inactive'}`}>
+                        {selectedUser.status === 'active' ? '✓ Activo' : '✗ Inactivo'}
+                      </span>
+                    )}
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Verificado:</span>
-                    <span className={`verified-badge ${selectedUser.verified ? 'verified' : 'not-verified'}`}>
-                      {selectedUser.verified ? '✓ Sí' : '✗ No'}
-                    </span>
+                    {isEditing ? (
+                      <select
+                        className="detail-input"
+                        value={editedUser.verified ? 'true' : 'false'}
+                        onChange={(e) => handleFieldChange('verified', e.target.value === 'true')}
+                      >
+                        <option value="true">✓ Sí</option>
+                        <option value="false">✗ No</option>
+                      </select>
+                    ) : (
+                      <span className={`verified-badge ${selectedUser.verified ? 'verified' : 'not-verified'}`}>
+                        {selectedUser.verified ? '✓ Sí' : '✗ No'}
+                      </span>
+                    )}
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Rol:</span>
-                    <span className={`role-badge ${selectedUser.role || 'user'}`}>
-                      {selectedUser.role === 'admin' ? '👑 Administrador' : '👤 Usuario'}
-                    </span>
+                    {isEditing ? (
+                      <select
+                        className="detail-input"
+                        value={editedUser.role || 'user'}
+                        onChange={(e) => handleFieldChange('role', e.target.value)}
+                      >
+                        <option value="user">👤 Usuario</option>
+                        <option value="admin">👑 Administrador</option>
+                      </select>
+                    ) : (
+                      <span className={`role-badge ${selectedUser.role || 'user'}`}>
+                        {selectedUser.role === 'admin' ? '👑 Administrador' : '👤 Usuario'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Tipo de Diabetes:</span>
+                    {isEditing ? (
+                      <select
+                        className="detail-input"
+                        value={editedUser.tipo_diabetes || ''}
+                        onChange={(e) => handleFieldChange('tipo_diabetes', e.target.value)}
+                      >
+                        <option value="">-- Seleccionar --</option>
+                        <option value="tipo1">Tipo 1</option>
+                        <option value="tipo2">Tipo 2</option>
+                        <option value="gestacional">Gestacional</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    ) : (
+                      <span className="detail-value">{selectedUser.tipo_diabetes || 'N/A'}</span>
+                    )}
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Aceptó Términos:</span>
@@ -338,24 +534,64 @@ function Users() {
                 </div>
               </div>
 
-              {selectedUser.objetivos && (
-                <div className="detail-section">
-                  <h3>Objetivos</h3>
-                  <p className="detail-text">{selectedUser.objetivos}</p>
-                </div>
-              )}
+              <div className="detail-section">
+                <h3>Objetivos</h3>
+                {isEditing ? (
+                  <textarea
+                    className="detail-textarea"
+                    value={editedUser.objetivos || ''}
+                    onChange={(e) => handleFieldChange('objetivos', e.target.value)}
+                    placeholder="Ingresa los objetivos del usuario..."
+                    rows="3"
+                  />
+                ) : (
+                  <p className="detail-text">{selectedUser.objetivos || 'No especificado'}</p>
+                )}
+              </div>
 
-              {selectedUser.restricciones && (
-                <div className="detail-section">
-                  <h3>Restricciones Alimentarias</h3>
-                  <p className="detail-text">{selectedUser.restricciones}</p>
-                </div>
-              )}
+              <div className="detail-section">
+                <h3>Restricciones Alimentarias</h3>
+                {isEditing ? (
+                  <textarea
+                    className="detail-textarea"
+                    value={editedUser.restricciones || ''}
+                    onChange={(e) => handleFieldChange('restricciones', e.target.value)}
+                    placeholder="Ingresa las restricciones alimentarias..."
+                    rows="3"
+                  />
+                ) : (
+                  <p className="detail-text">{selectedUser.restricciones || 'No especificado'}</p>
+                )}
+              </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={closeUserDetail}>
-                Cerrar
-              </button>
+              {isEditing ? (
+                <>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={handleCancelEdit}
+                    disabled={saving}
+                  >
+                    ✕ Cancelar
+                  </button>
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={handleSaveChanges}
+                    disabled={saving}
+                  >
+                    {saving ? '⏳ Guardando...' : '💾 Guardar Cambios'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="btn btn-secondary" onClick={closeUserDetail}>
+                    Cerrar
+                  </button>
+                  <button className="btn btn-primary" onClick={handleEditClick}>
+                    ✏️ Editar Usuario
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

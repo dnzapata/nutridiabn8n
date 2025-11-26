@@ -46,6 +46,18 @@ export const nutridiabApi = {
   },
 
   /**
+   * Actualizar un usuario
+   */
+  updateUser: async (userId, userData) => {
+    try {
+      const response = await api.put(`/webhook/nutridiab/admin/usuarios/${userId}`, userData);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
    * Obtener todas las consultas
    */
   getConsultas: async (params = {}) => {

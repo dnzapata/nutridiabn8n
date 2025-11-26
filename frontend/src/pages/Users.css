@@ -583,3 +583,72 @@
   }
 }
 
+/* Estilos para campos editables */
+.detail-input,
+.detail-textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.detail-input:focus,
+.detail-textarea:focus {
+  outline: none;
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+.detail-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.detail-textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+.detail-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.detail-input[type="number"]::-webkit-outer-spin-button,
+.detail-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+select.detail-input {
+  cursor: pointer;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px;
+}
+
+/* Indicador de campo no editable */
+.detail-value[style*="italic"] {
+  background-color: #f9f9f9;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 2px solid #e9ecef;
+}
+
+/* Ajustes para el modal en modo edición */
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-footer .btn {
+  min-width: 120px;
+}
+

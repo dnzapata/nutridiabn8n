@@ -1,0 +1,120 @@
+{
+  "name": "Nutridiab - Admin Actualizar Usuario",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "PUT",
+        "path": "nutridiab/admin/usuarios/:id",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-update-user",
+      "name": "Webhook Update User",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extraer ID del usuario de la URL\nconst userId = $input.item.json.params.id;\n\n// Extraer datos del body\nconst body = $input.item.json.body;\n\n// Validar que tengamos un ID\nif (!userId) {\n  return [{\n    json: {\n      success: false,\n      error: 'ID de usuario requerido'\n    }\n  }];\n}\n\n// Preparar datos para actualización\nconst updateData = {\n  userId: parseInt(userId),\n  nombre: body.nombre || null,\n  apellido: body.apellido || null,\n  email: body.email || null,\n  edad: body.edad ? parseInt(body.edad) : null,\n  peso: body.peso ? parseFloat(body.peso) : null,\n  altura: body.altura ? parseFloat(body.altura) : null,\n  objetivos: body.objetivos || null,\n  restricciones: body.restricciones || null,\n  tipo_diabetes: body.tipo_diabetes || null,\n  verified: body.verified !== undefined ? body.verified : null,\n  status: body.status || null,\n  role: body.role || null,\n  newPassword: body.newPassword || null,\n  changePassword: body.newPassword && body.newPassword.trim() !== '' ? true : false\n};\n\nreturn [{ json: updateData }];"
+      },
+      "id": "parse-data",
+      "name": "Parse Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE nutridiab.usuarios\nSET \n  nombre = COALESCE($1, nombre),\n  apellido = COALESCE($2, apellido),\n  email = COALESCE($3, email),\n  edad = COALESCE($4, edad),\n  peso = COALESCE($5, peso),\n  altura = COALESCE($6, altura),\n  objetivos = COALESCE($7, objetivos),\n  restricciones = COALESCE($8, restricciones),\n  tipo_diabetes = COALESCE($9, tipo_diabetes),\n  email_verificado = COALESCE($10, email_verificado),\n  \"Activo\" = CASE \n    WHEN $11 = 'active' THEN TRUE \n    WHEN $11 = 'inactive' THEN FALSE \n    ELSE \"Activo\" \n  END,\n  rol = CASE \n    WHEN $12 = 'admin' THEN 'administrador'\n    WHEN $12 = 'user' THEN 'usuario'\n    ELSE rol\n  END,\n  password_hash = CASE \n    WHEN $13 = true AND $14 IS NOT NULL AND $14 != '' THEN crypt($14, gen_salt('bf'))\n    ELSE password_hash\n  END,\n  updated_at = NOW()\nWHERE \"usuario ID\" = $15\nRETURNING \n  \"usuario ID\" as id,\n  nombre,\n  apellido,\n  email,\n  edad,\n  peso,\n  altura,\n  objetivos,\n  restricciones,\n  tipo_diabetes,\n  email_verificado,\n  \"Activo\",\n  rol,\n  updated_at;",
+        "additionalFields": {
+          "queryParameters": "={{ [\n  $json.nombre,\n  $json.apellido,\n  $json.email,\n  $json.edad,\n  $json.peso,\n  $json.altura,\n  $json.objetivos,\n  $json.restricciones,\n  $json.tipo_diabetes,\n  $json.verified,\n  $json.status,\n  $json.role,\n  $json.changePassword,\n  $json.newPassword,\n  $json.userId\n] }}"
+        },
+        "options": {}
+      },
+      "id": "postgres-update",
+      "name": "Postgres Update",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [650, 300],
+      "credentials": {
+        "postgres": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Supabase - Nutridiab"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verificar si la actualización fue exitosa\nconst result = $input.all();\n\nif (result && result.length > 0) {\n  const user = result[0].json;\n  \n  return [{\n    json: {\n      success: true,\n      message: 'Usuario actualizado correctamente',\n      user: {\n        id: user.id,\n        nombre: user.nombre,\n        apellido: user.apellido,\n        email: user.email,\n        edad: user.edad,\n        peso: user.peso,\n        altura: user.altura,\n        objetivos: user.objetivos,\n        restricciones: user.restricciones,\n        tipo_diabetes: user.tipo_diabetes,\n        verified: user.email_verificado,\n        status: user.Activo ? 'active' : 'inactive',\n        role: user.rol === 'administrador' ? 'admin' : 'user',\n        updated_at: user.updated_at\n      }\n    }\n  }];\n} else {\n  return [{\n    json: {\n      success: false,\n      error: 'No se pudo actualizar el usuario'\n    }\n  }];\n}"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Update User": {
+      "main": [
+        [
+          {
+            "node": "Parse Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Data": {
+      "main": [
+        [
+          {
+            "node": "Postgres Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Update": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
+
