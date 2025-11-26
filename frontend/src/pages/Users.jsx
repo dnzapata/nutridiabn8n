@@ -316,6 +316,18 @@ function Users() {
                     </span>
                   </div>
                   <div className="detail-item">
+                    <span className="detail-label">Aceptó Términos:</span>
+                    <span className={`verified-badge ${(selectedUser.AceptoTerminos || selectedUser.acepto_terminos) ? 'verified' : 'not-verified'}`}>
+                      {(selectedUser.AceptoTerminos || selectedUser.acepto_terminos) ? '✓ Sí' : '✗ No'}
+                    </span>
+                  </div>
+                  {(selectedUser.aceptadoel || selectedUser.fecha_aceptacion) && (
+                    <div className="detail-item">
+                      <span className="detail-label">Fecha de Aceptación:</span>
+                      <span className="detail-value">{formatDate(selectedUser.aceptadoel || selectedUser.fecha_aceptacion)}</span>
+                    </div>
+                  )}
+                  <div className="detail-item">
                     <span className="detail-label">Fecha de Registro:</span>
                     <span className="detail-value">{formatDate(selectedUser.created_at)}</span>
                   </div>
