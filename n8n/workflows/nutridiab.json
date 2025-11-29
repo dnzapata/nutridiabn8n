@@ -18,3 +18,4 @@
   "note": "⚠️ WORKFLOW ACTUALIZADO CON NODOS POSTGRES ⚠️\n\nEste workflow ha sido migrado de Supabase a PostgreSQL nativo.\n\nNodos modificados:\n- Get a row (Postgres): SELECT desde tabla usuarios\n- Create a row (Postgres): INSERT en tabla usuarios\n- Update a row (Postgres): UPDATE tabla usuarios\n- Guardar Consulta Texto (Postgres): INSERT en tabla Consultas\n- Guardar consulta Imagen (Postgres): INSERT en tabla Consultas\n- Guardar consulta Audio (Postgres): INSERT en tabla Consultas\n\nTodos los nodos ahora usan 'n8n-nodes-base.postgres' (v2.6)\n\n⚠️ IMPORTANTE: Configura las credenciales de PostgreSQL en n8n antes de activar el workflow."
 }
 
+

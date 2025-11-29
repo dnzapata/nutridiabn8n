@@ -1,0 +1,248 @@
+{
+  "name": "[PROD] - NutriDiab Main (Modular)",
+  "nodes": [
+    {
+      "id": "webhook1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [250, 400],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nutridiab-modular",
+        "options": {}
+      },
+      "webhookId": "nutridiab-modular-v2"
+    },
+    {
+      "id": "extractData",
+      "name": "Extraer Datos WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 400],
+      "parameters": {
+        "jsCode": "const data = $json.body;\nreturn [{\n  json: {\n    server_url: data.server_url,\n    instance: data.instance,\n    apikey: data.apikey,\n    messageid: data.data.key.id,\n    chatid: data.data.key.remoteJid,\n    remoteJid: data.data.key.remoteJid,\n    conten: data.data.message.conversation || '',\n    username: data.data.pushName,\n    Tipo: data.data.message.imageMessage ? 'imagen' : data.data.message.audioMessage ? 'audio' : 'texto'\n  }\n}];"
+      }
+    },
+    {
+      "id": "getSaldo",
+      "name": "Obtener Saldo",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [650, 400],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "odDQxGwfW0ns656H",
+          "mode": "list"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "getUser",
+      "name": "Verificar Usuario",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [850, 400],
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "nutridiab",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "usuarios",
+          "mode": "list"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "remoteJid",
+              "value": "={{ $('Extraer Datos WhatsApp').item.json.remoteJid }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "3B6LqpqjxhMnJHqD",
+          "name": "Postgres zynaptyc"
+        }
+      },
+      "alwaysOutputData": true
+    },
+    {
+      "id": "processText",
+      "name": "Procesar con IA",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [1050, 400],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "DrxGjaFZMI8tr75b",
+          "mode": "list"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "prepareWhatsApp",
+      "name": "Preparar Mensaje WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 400],
+      "parameters": {
+        "jsCode": "const datosWA = $('Extraer Datos WhatsApp').item.json;\nconst analisis = $json.analisis_nutricional;\n\nreturn [{\n  json: {\n    server_url: datosWA.server_url,\n    instance: datosWA.instance,\n    apikey: datosWA.apikey,\n    chatid: datosWA.chatid,\n    mensaje: analisis\n  }\n}];"
+      }
+    },
+    {
+      "id": "sendResponse",
+      "name": "Enviar Respuesta WhatsApp",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [1450, 400],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "v8537UWT5hCB70nF",
+          "mode": "list"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "prepareConsultation",
+      "name": "Preparar Consulta para Guardar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 400],
+      "parameters": {
+        "jsCode": "const usuario = $('Verificar Usuario').item.json;\nconst analisisData = $('Procesar con IA').item.json;\nconst datosWA = $('Extraer Datos WhatsApp').item.json;\n\nreturn [{\n  json: {\n    tipo: datosWA.Tipo,\n    usuario_id: usuario['usuario ID'] || usuario.usuario_id,\n    resultado: analisisData.analisis_nutricional,\n    costo: analisisData.costo\n  }\n}];"
+      }
+    },
+    {
+      "id": "saveConsultation",
+      "name": "Guardar Consulta",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [1850, 400],
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "9166zpx7ivXXnFsy",
+          "mode": "list"
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extraer Datos WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Datos WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Obtener Saldo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Saldo": {
+      "main": [
+        [
+          {
+            "node": "Verificar Usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Usuario": {
+      "main": [
+        [
+          {
+            "node": "Procesar con IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar con IA": {
+      "main": [
+        [
+          {
+            "node": "Preparar Mensaje WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Mensaje WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Enviar Respuesta WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Respuesta WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Preparar Consulta para Guardar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Consulta para Guardar": {
+      "main": [
+        [
+          {
+            "node": "Guardar Consulta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "tags": [
+    {
+      "name": "nutridiab"
+    },
+    {
+      "name": "modular"
+    }
+  ]
+}
+

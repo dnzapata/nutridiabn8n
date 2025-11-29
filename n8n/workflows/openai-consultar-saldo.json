@@ -1,0 +1,132 @@
+{
+  "name": "Consultar Saldo OpenAI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "openai/balance",
+        "responseMode": "responseNode",
+        "options": {
+          "onError": "continueRegularOutput"
+        }
+      },
+      "id": "webhook-openai-balance",
+      "name": "Webhook Consultar Saldo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "openai-balance"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openai.com/v1/dashboard/billing/subscription",
+        "method": "GET",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.OPENAI_API_KEY }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-openai-usage",
+      "name": "HTTP Request - OpenAI Usage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener datos de la respuesta de OpenAI\nconst inputData = $input.first();\nconst openaiResponse = inputData.json;\nconst timestamp = new Date().toISOString();\n\n// Verificar si hay error\nif (inputData.statusCode && inputData.statusCode >= 400) {\n  return {\n    success: false,\n    timestamp: timestamp,\n    error: {\n      message: openaiResponse.error?.message || 'Error al consultar OpenAI',\n      type: openaiResponse.error?.type || 'unknown',\n      statusCode: inputData.statusCode\n    },\n    note: 'Asegúrate de tener configurada tu API key de OpenAI correctamente'\n  };\n}\n\n// Formatear respuesta exitosa\nlet response = {\n  success: true,\n  timestamp: timestamp,\n  source: 'OpenAI API',\n  data: openaiResponse\n};\n\n// Extraer información de facturación si está disponible\nif (openaiResponse.hard_limit_usd !== undefined) {\n  response.billing = {\n    hard_limit_usd: openaiResponse.hard_limit_usd,\n    soft_limit_usd: openaiResponse.soft_limit_usd || null,\n    system_hard_limit_usd: openaiResponse.system_hard_limit_usd || null\n  };\n}\n\n// Si hay información de suscripción\nif (openaiResponse.has_payment_method !== undefined) {\n  response.subscription = {\n    has_payment_method: openaiResponse.has_payment_method,\n    plan: openaiResponse.plan || null,\n    access_until: openaiResponse.access_until || null\n  };\n}\n\n// Si hay información de organización\nif (openaiResponse.organization_id) {\n  response.organization = {\n    id: openaiResponse.organization_id\n  };\n}\n\nreturn response;"
+      },
+      "id": "code-format-response",
+      "name": "Formatear Respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-balance",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        850,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Consultar Saldo": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - OpenAI Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - OpenAI Usage": {
+      "main": [
+        [
+          {
+            "node": "Formatear Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  },
+  "staticData": null,
+  "tags": []
+}
