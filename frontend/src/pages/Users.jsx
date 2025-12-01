@@ -76,7 +76,10 @@ function Users() {
   };
 
   const handleEditClick = () => {
-    setEditedUser({ ...selectedUser });
+    setEditedUser({ 
+      ...selectedUser,
+      AceptoTerminos: selectedUser.AceptoTerminos || selectedUser.acepto_terminos || false
+    });
     setIsEditing(true);
   };
 
@@ -109,7 +112,8 @@ function Users() {
         tipo_diabetes: editedUser.tipo_diabetes || '',
         verified: editedUser.verified,
         status: editedUser.status,
-        role: editedUser.role
+        role: editedUser.role,
+        AceptoTerminos: editedUser.AceptoTerminos !== undefined ? editedUser.AceptoTerminos : (editedUser.acepto_terminos !== undefined ? editedUser.acepto_terminos : null)
       };
 
       // Agregar nueva contraseña solo si se proporcionó
@@ -513,9 +517,20 @@ function Users() {
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Aceptó Términos:</span>
-                    <span className={`verified-badge ${(selectedUser.AceptoTerminos || selectedUser.acepto_terminos) ? 'verified' : 'not-verified'}`}>
-                      {(selectedUser.AceptoTerminos || selectedUser.acepto_terminos) ? '✓ Sí' : '✗ No'}
-                    </span>
+                    {isEditing ? (
+                      <select
+                        className="detail-input"
+                        value={(editedUser.AceptoTerminos || editedUser.acepto_terminos) ? 'true' : 'false'}
+                        onChange={(e) => handleFieldChange('AceptoTerminos', e.target.value === 'true')}
+                      >
+                        <option value="true">✓ Sí</option>
+                        <option value="false">✗ No</option>
+                      </select>
+                    ) : (
+                      <span className={`verified-badge ${(selectedUser.AceptoTerminos || selectedUser.acepto_terminos) ? 'verified' : 'not-verified'}`}>
+                        {(selectedUser.AceptoTerminos || selectedUser.acepto_terminos) ? '✓ Sí' : '✗ No'}
+                      </span>
+                    )}
                   </div>
                   {(selectedUser.aceptadoel || selectedUser.fecha_aceptacion) && (
                     <div className="detail-item">

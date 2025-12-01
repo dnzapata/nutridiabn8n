@@ -168,3 +168,4 @@ Si el endpoint de facturación no está disponible, puedes modificar el workflow
   - Endpoint: `/v1/dashboard/billing/subscription`
   - Manejo de errores mejorado
   - Formateo de respuesta estructurado
+

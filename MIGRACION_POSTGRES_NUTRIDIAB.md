@@ -179,3 +179,4 @@ Esto maneja tanto:
 **¿Necesitas ayuda?** Consulta la [documentación de nodos PostgreSQL de n8n](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.postgres/)
 
 
+
